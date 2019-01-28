@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2046
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02 - Serialize", "02 - Serialize", "{E3EF424A-D659-46CE-9F81-6C754876E9BB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03 - Communication", "03 - Communication", "{45F6342B-09C2-46ED-ADE8-58735DCEDE9B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueDB.Communication", "Communication\BlueDB.Communication\BlueDB.Communication.csproj", "{8C071021-4BD2-4B59-A7D3-FE9EC31C38A1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 - Host", "01 - Host", "{FE816180-1E65-47B7-A540-9D9EC0F271A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueDB.Host", "Host\BlueDB.Host\BlueDB.Host.csproj", "{4C51E83E-9033-4929-8CE8-AD8D774D2190}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlueDB.Serialize", "Serialize\BlueDB.Serialize\BlueDB.Serialize.csproj", "{35CBCF48-C8DB-4E2A-82EB-962EEA694532}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueDB.Serialize.Tests", "Serialize\BlueDB.Serialize.Tests\BlueDB.Serialize.Tests.csproj", "{7FBCCE5C-7FB3-4441-BEF9-D031318DC8D1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8C071021-4BD2-4B59-A7D3-FE9EC31C38A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C071021-4BD2-4B59-A7D3-FE9EC31C38A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C071021-4BD2-4B59-A7D3-FE9EC31C38A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C071021-4BD2-4B59-A7D3-FE9EC31C38A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C51E83E-9033-4929-8CE8-AD8D774D2190}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C51E83E-9033-4929-8CE8-AD8D774D2190}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C51E83E-9033-4929-8CE8-AD8D774D2190}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C51E83E-9033-4929-8CE8-AD8D774D2190}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35CBCF48-C8DB-4E2A-82EB-962EEA694532}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35CBCF48-C8DB-4E2A-82EB-962EEA694532}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35CBCF48-C8DB-4E2A-82EB-962EEA694532}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35CBCF48-C8DB-4E2A-82EB-962EEA694532}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FBCCE5C-7FB3-4441-BEF9-D031318DC8D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FBCCE5C-7FB3-4441-BEF9-D031318DC8D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FBCCE5C-7FB3-4441-BEF9-D031318DC8D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FBCCE5C-7FB3-4441-BEF9-D031318DC8D1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8C071021-4BD2-4B59-A7D3-FE9EC31C38A1} = {45F6342B-09C2-46ED-ADE8-58735DCEDE9B}
+		{4C51E83E-9033-4929-8CE8-AD8D774D2190} = {FE816180-1E65-47B7-A540-9D9EC0F271A9}
+		{35CBCF48-C8DB-4E2A-82EB-962EEA694532} = {E3EF424A-D659-46CE-9F81-6C754876E9BB}
+		{7FBCCE5C-7FB3-4441-BEF9-D031318DC8D1} = {E3EF424A-D659-46CE-9F81-6C754876E9BB}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5F7DE442-1D44-4691-9FB9-BFE65D741DC7}
+	EndGlobalSection
+EndGlobal
