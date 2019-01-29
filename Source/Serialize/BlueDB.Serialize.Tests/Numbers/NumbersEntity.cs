@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BlueDB.Serialize.Tests
+namespace BlueDB.Serialize.Tests.Numbers
 {
 #pragma warning disable
     [Serializable]

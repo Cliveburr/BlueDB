@@ -30,7 +30,11 @@ namespace BlueDB.Serialize
                 new UInt32KnowProperty(),
                 new Int64KnowProperty(),
                 new UInt64KnowProperty(),
-                new StringKnowProperty()
+                new StringKnowProperty(),
+                new DateTimeKnowProperty(),
+                new ArrayKnowProperty(),
+                new ClassKnowProperty()
+
             };
         }
 

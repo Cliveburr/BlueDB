@@ -43,8 +43,10 @@ namespace BlueDB.Serialize.KnowProperty
             }
             else
             {
-                writer.Write((uint)(value.Length + 1));
-                writer.Write(Encoding.UTF8.GetBytes(value));  //BinaryStringFormat.NoPrefixOrTermination
+                var bytes = Encoding.UTF8.GetBytes(value);
+
+                writer.Write((uint)(bytes.Length + 1));
+                writer.Write(bytes);
             }
         }
 
@@ -63,11 +65,7 @@ namespace BlueDB.Serialize.KnowProperty
             else
             {
                 var bytes = reader.ReadBytes((int)(length - 1));
-
-                var a = bytes.Where(b => b == 0).ToArray();
-
                 _propertyInfo.SetValue(obj, Encoding.UTF8.GetString(bytes));
-
             }
         }
     }

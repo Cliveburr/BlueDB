@@ -54,6 +54,14 @@ namespace BlueDB.Serialize
             }
         }
 
+        internal void Serialize(BinaryWriter writeStream, object obj)
+        {
+            foreach (var property in Properties)
+            {
+                property.Serialize(writeStream, obj);
+            }
+        }
+
         public object Deserialize(byte[] bytes)
         {
             var obj = Activator.CreateInstance(ObjectType);
@@ -67,6 +75,14 @@ namespace BlueDB.Serialize
                 }
 
                 return obj;
+            }
+        }
+
+        internal void Deserialize(BinaryReader readerStream, object obj)
+        {
+            foreach (var property in Properties)
+            {
+                property.Deserialize(readerStream, obj);
             }
         }
     }

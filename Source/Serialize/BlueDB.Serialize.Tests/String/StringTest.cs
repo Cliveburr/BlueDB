@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace BlueDB.Serialize.Tests
+namespace BlueDB.Serialize.Tests.String
 {
     [TestClass]
     public class StringTest
@@ -26,8 +26,21 @@ namespace BlueDB.Serialize.Tests
             sw.Stop();
 
             Compare(values, returnedValues);
-
+            
             Debug.WriteLine($"StringTest.CustomSerialize - Bytes: {bytes.Length.ToString()} - Elapsed: {sw.Elapsed.ToString()}");
+        }
+
+        [TestMethod]
+        public void DNETSerialize()
+        {
+            var values = new StringEntity();
+            values.Populate();
+
+            var tested = DNETSerializeHelper.TestDNETSerialize(values);
+
+            Compare(values, tested.Item3 as StringEntity);
+
+            Debug.WriteLine($"StringTest.DNETSerialize - Bytes: {tested.Item2.ToString()} - Elapsed: {tested.Item1.ToString()}");
         }
 
         public static void Compare(StringEntity from, StringEntity to)

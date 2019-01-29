@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace BlueDB.Serialize.Tests
+namespace BlueDB.Serialize.Tests.Numbers
 {
     [TestClass]
     public class NumbersTest
