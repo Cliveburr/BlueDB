@@ -53,7 +53,7 @@ namespace BlueDB.Serialize.Tests.Numbers
 
             Compare(_values, returnedValues);
 
-            Debug.WriteLine($"TestNumber - Bytes: {bytes.Length.ToString()} - Elapsed: {sw.Elapsed.ToString()}");
+            Debug.WriteLine($"NumbersTest.CustomSerialize - Bytes: {bytes.Length.ToString()} - Elapsed: {sw.Elapsed.ToString()}");
         }
 
         [TestMethod]
@@ -79,7 +79,7 @@ namespace BlueDB.Serialize.Tests.Numbers
 
                     Compare(_values, returnedValues);
 
-                    Debug.WriteLine($"DNETSerialize - Bytes: {bytes.Length.ToString()} - Elapsed: {sw.Elapsed.ToString()}");
+                    Debug.WriteLine($"NumbersTest.DNETSerialize - Bytes: {bytes.Length.ToString()} - Elapsed: {sw.Elapsed.ToString()}");
                 }
             }
         }

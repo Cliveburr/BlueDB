@@ -1,4 +1,4 @@
-﻿using BlueDB.Serialize.KnowProperty;
+﻿using BlueDB.Serialize.Types;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,56 +9,55 @@ namespace BlueDB.Serialize
 {
     public static class BinarySerialize
     {
-        public static IDictionary<string, SerializeObjectType> ObjectTypes { get; private set; }
-        public static IList<ISerilizeObjectKnowProperty> KnowProperties { get; set; }
+        public static IList<SerializeType> KnowTypes { get; set; }
 
         static BinarySerialize()
         {
-            ObjectTypes = new Dictionary<string, SerializeObjectType>();
-
-            SetDefaultKnowProperties();
+            SetDefaultKnowTypes();
         }
-        
-        private static void SetDefaultKnowProperties()
-        {
-            KnowProperties = new List<ISerilizeObjectKnowProperty>
-            {
-                new ByteKnowProperty(),
-                new Int16KnowProperty(),
-                new UInt16KnowProperty(),
-                new Int32KnowProperty(),
-                new UInt32KnowProperty(),
-                new Int64KnowProperty(),
-                new UInt64KnowProperty(),
-                new StringKnowProperty(),
-                new DateTimeKnowProperty(),
-                new ArrayKnowProperty(),
-                new ClassKnowProperty()
 
+        private static void SetDefaultKnowTypes()
+        {
+            KnowTypes = new List<SerializeType>
+            {
+                new ByteType(),
+                new Int16Type(),
+                new UInt16Type(),
+                new Int32Type(),
+                new UInt32Type(),
+                new Int64Type(),
+                new UInt64Type(),
+                new StringType(),
+                new DateTimeType(),
+                new ArrayType(),
+                new IEnumerableType()
             };
         }
 
-        public static SerializeObjectType From(Type type)
+        public static SerializeType From(Type type)
         {
-            var fullName = type.FullName;
-            if (!ObjectTypes.ContainsKey(fullName))
+            var knowType = KnowTypes
+                .Where(kp => kp.Test(type))
+                .FirstOrDefault();
+
+            if (knowType == null)
             {
-                var newObjectType = new SerializeObjectType(type);
-                ObjectTypes[fullName] = newObjectType;
+                var genericNowType = typeof(ClassType<>).MakeGenericType(type);
+                knowType = (SerializeType)Activator.CreateInstance(genericNowType);
             }
-            return ObjectTypes[fullName];
+
+            if (knowType == null)
+            {
+                throw new NotSupportedException($"Type \"{type.FullName}\" not supported for this serialize!");
+            }
+
+            return knowType;
         }
 
-        public static SerializeObjectGenericType<T> From<T>()
+        public static SerializeType<T> From<T>()
         {
             var type = typeof(T);
-            var fullName = type.FullName;
-            if (!ObjectTypes.ContainsKey(fullName))
-            {
-                var newObjectType = new SerializeObjectGenericType<T>(type);
-                ObjectTypes[fullName] = newObjectType;
-            }
-            return ObjectTypes[fullName] as SerializeObjectGenericType<T>;
+            return (SerializeType<T>)From(type);
         }
     }
 }
