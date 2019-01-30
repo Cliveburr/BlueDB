@@ -15,31 +15,6 @@ namespace BlueDB.Communication
         public Socket Socket { get; private set; }
         public SocketServer Server { get; private set; }
 
-        private class MessageState : IDisposable
-        {
-            public byte[] Buffer { get; set; }
-
-            private MemoryStream _memoryStream;
-            private BinaryWriter _binaryWriter;
-
-            public MessageState()
-            {
-                _memoryStream = new MemoryStream();
-                _binaryWriter = new BinaryWriter(_memoryStream);
-            }
-
-            public void Dispose()
-            {
-                _memoryStream?.Dispose();
-                _binaryWriter?.Dispose();
-            }
-
-            public void WriteBufferToStream(int count)
-            {
-                _binaryWriter.Write(Buffer, 0, count);
-            }
-        }
-
         public SocketClientHandler(Socket socket, SocketServer server)
         {
             Socket = socket;
@@ -48,12 +23,15 @@ namespace BlueDB.Communication
 
         public void Start()
         {
-            var state = new MessageState
+            BeginReceive(new SocketClientMessage
             {
                 Buffer = new byte[Server.BufferSize]
-            };
+            });
+        }
 
-            Socket.BeginReceive(state.Buffer, 0, Server.BufferSize, 0, new AsyncCallback(ReadCallback), state);
+        private void BeginReceive(SocketClientMessage message)
+        {
+            Socket.BeginReceive(message.Buffer, 0, Server.BufferSize, 0, new AsyncCallback(ReadCallback), message);
         }
 
         public void Stop()
@@ -61,28 +39,39 @@ namespace BlueDB.Communication
             OnClose?.Invoke(this);
         }
 
-        public void ReadCallback(IAsyncResult ar)
+        private void ReadCallback(IAsyncResult ar)
         {
-            var state = (MessageState)ar.AsyncState;
+            var message = (SocketClientMessage)ar.AsyncState;
 
             var bytesRead = Socket.EndReceive(ar);
             if (bytesRead > 0)
             {
-                state.WriteBufferToStream(bytesRead);
+                message.WriteBufferToStream(bytesRead);
 
-                Socket.BeginReceive(state.Buffer, 0, Server.BufferSize, 0, new AsyncCallback(ReadCallback), state);
+                if (message.State == SocketClientMessageState.Receiving)
+                {
+                    BeginReceive(message);
+                }
+                else
+                {
+                    FinishReceiving(message);
+                }
             }
             else
             {
-                // process the state
-
-                var newState = new MessageState
-                {
-                    Buffer = new byte[Server.BufferSize]
-                };
-
-                Socket.BeginReceive(newState.Buffer, 0, Server.BufferSize, 0, new AsyncCallback(ReadCallback), newState);
+                FinishReceiving(message);
             }
+        }
+
+        private void FinishReceiving(SocketClientMessage message)
+        {
+            BeginReceive(new SocketClientMessage
+            {
+                Buffer = new byte[Server.BufferSize]
+            });
+
+            message.State = SocketClientMessageState.Processing;
+
         }
 
         private static void Send(Socket handler, String data)

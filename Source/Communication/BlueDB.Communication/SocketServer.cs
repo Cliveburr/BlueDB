@@ -50,11 +50,6 @@ namespace BlueDB.Communication
 
         private void AcceptCallback(IAsyncResult ar)
         {
-            if (!Listener.Connected)
-            {
-                return;
-            }
-
             var handler = Listener.EndAccept(ar);
 
             Listener.BeginAccept(new AsyncCallback(AcceptCallback), null);
