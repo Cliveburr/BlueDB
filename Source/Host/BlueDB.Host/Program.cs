@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BlueDB.Communication;
+using System;
 
 namespace BlueDB.Host
 {
@@ -6,7 +7,10 @@ namespace BlueDB.Host
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var server = new SocketServer();
+            server.Start(8011);
+
+            Console.ReadKey();
         }
     }
 }

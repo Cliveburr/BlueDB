@@ -4,20 +4,20 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace BlueDB.Serialize.Tests.IEnumerable
+namespace BlueDB.Serialize.Tests.Interface
 {
     [TestClass]
-    public class IEnumerableTest
+    public class InterfaceTest
     {
         [TestMethod]
         public void CustomSerialize()
         {
-            var values = new IEnumerableEntity();
+            var values = new InterfaceEntity();
             values.Populate();
 
             var sw = Stopwatch.StartNew();
 
-            var serialize = BinarySerialize.From<IEnumerableEntity>();
+            var serialize = BinarySerialize.From<InterfaceEntity>();
 
             var bytes = serialize.Serialize(values);
 
@@ -25,30 +25,34 @@ namespace BlueDB.Serialize.Tests.IEnumerable
 
             sw.Stop();
 
-            //Compare(values, returnedValues);
+            Compare(values, returnedValues);
 
-            Debug.WriteLine($"IEnumerableTest.CustomSerialize - Bytes: {bytes.Length.ToString()} - Elapsed: {sw.Elapsed.ToString()}");
+            Debug.WriteLine($"InterfaceTest.CustomSerialize - Bytes: {bytes.Length.ToString()} - Elapsed: {sw.Elapsed.ToString()}");
         }
 
         [TestMethod]
         public void DNETSerialize()
         {
-            var values = new IEnumerableEntity();
+            var values = new InterfaceEntity();
             values.Populate();
 
             var tested = DNETSerializeHelper.TestDNETSerialize(values);
 
-            Compare(values, tested.Item3 as IEnumerableEntity);
+            Compare(values, tested.Item3 as InterfaceEntity);
 
-            Debug.WriteLine($"ArrayTest.DNETSerialize - Bytes: {tested.Item2.ToString()} - Elapsed: {tested.Item1.ToString()}");
+            Debug.WriteLine($"InterfaceTest.DNETSerialize - Bytes: {tested.Item2.ToString()} - Elapsed: {tested.Item1.ToString()}");
         }
 
-        private void Compare(IEnumerableEntity from, IEnumerableEntity to)
+        public static void Compare(InterfaceEntity from, InterfaceEntity to)
         {
-            CompareArray(from.IEnumerableInt, to.IEnumerableInt);
+            Assert.AreEqual(from.ImplementationOne, to.ImplementationOne);
+            Assert.AreEqual(from.ImplementationTwo, to.ImplementationTwo);
+            Assert.AreEqual(from.SomeNullValue, to.SomeNullValue);
+            CompareArray(from.ListOfInterface, to.ListOfInterface);
+            CompareArray(from.ArrayOfInterface, to.ArrayOfInterface);
         }
 
-        private void CompareArray(System.Collections.IEnumerable from, System.Collections.IEnumerable to)
+        private static void CompareArray(System.Collections.IEnumerable from, System.Collections.IEnumerable to)
         {
             if (!(from != null ^ to != null))
             {

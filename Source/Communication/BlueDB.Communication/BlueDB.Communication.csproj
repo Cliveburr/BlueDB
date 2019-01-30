@@ -8,4 +8,8 @@
     <ProjectReference Include="..\..\Serialize\BlueDB.Serialize\BlueDB.Serialize.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Messages\" />
+  </ItemGroup>
+
 </Project>

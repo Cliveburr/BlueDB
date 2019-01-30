@@ -30,7 +30,8 @@ namespace BlueDB.Serialize
                 new StringType(),
                 new DateTimeType(),
                 new ArrayType(),
-                new IEnumerableType()
+                new IEnumerableType(),
+                new InterfaceType()
             };
         }
 
