@@ -23,13 +23,13 @@ namespace BlueDB.Communication
 
         public void Start()
         {
-            BeginReceive(new SocketClientMessage
+            BeginReceive(new SocketMessage
             {
                 Buffer = new byte[Server.BufferSize]
             });
         }
 
-        private void BeginReceive(SocketClientMessage message)
+        private void BeginReceive(SocketMessage message)
         {
             Socket.BeginReceive(message.Buffer, 0, Server.BufferSize, 0, new AsyncCallback(ReadCallback), message);
         }
@@ -41,14 +41,23 @@ namespace BlueDB.Communication
 
         private void ReadCallback(IAsyncResult ar)
         {
-            var message = (SocketClientMessage)ar.AsyncState;
+            var message = (SocketMessage)ar.AsyncState;
+            var bytesRead = 0;
 
-            var bytesRead = Socket.EndReceive(ar);
+            try
+            {
+                bytesRead = Socket.EndReceive(ar);
+            }
+            catch (Exception err)
+            {
+                HandleError(err);
+            }
+
             if (bytesRead > 0)
             {
                 message.WriteBufferToStream(bytesRead);
 
-                if (message.State == SocketClientMessageState.Receiving)
+                if (message.State == SocketMessageState.Receiving)
                 {
                     BeginReceive(message);
                 }
@@ -63,14 +72,19 @@ namespace BlueDB.Communication
             }
         }
 
-        private void FinishReceiving(SocketClientMessage message)
+        private void HandleError(Exception err)
         {
-            BeginReceive(new SocketClientMessage
+
+        }
+
+        private void FinishReceiving(SocketMessage message)
+        {
+            BeginReceive(new SocketMessage
             {
                 Buffer = new byte[Server.BufferSize]
             });
 
-            message.State = SocketClientMessageState.Processing;
+            //message.State = SocketMessageState.Processing;
 
         }
 

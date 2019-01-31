@@ -7,15 +7,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02 - Serialize", "02 - Seri
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03 - Communication", "03 - Communication", "{45F6342B-09C2-46ED-ADE8-58735DCEDE9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueDB.Communication", "Communication\BlueDB.Communication\BlueDB.Communication.csproj", "{8C071021-4BD2-4B59-A7D3-FE9EC31C38A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlueDB.Communication", "Communication\BlueDB.Communication\BlueDB.Communication.csproj", "{8C071021-4BD2-4B59-A7D3-FE9EC31C38A1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 - Host", "01 - Host", "{FE816180-1E65-47B7-A540-9D9EC0F271A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueDB.Host", "Host\BlueDB.Host\BlueDB.Host.csproj", "{4C51E83E-9033-4929-8CE8-AD8D774D2190}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlueDB.Host", "Host\BlueDB.Host\BlueDB.Host.csproj", "{4C51E83E-9033-4929-8CE8-AD8D774D2190}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlueDB.Serialize", "Serialize\BlueDB.Serialize\BlueDB.Serialize.csproj", "{35CBCF48-C8DB-4E2A-82EB-962EEA694532}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueDB.Serialize.Tests", "Serialize\BlueDB.Serialize.Tests\BlueDB.Serialize.Tests.csproj", "{7FBCCE5C-7FB3-4441-BEF9-D031318DC8D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlueDB.Serialize.Tests", "Serialize\BlueDB.Serialize.Tests\BlueDB.Serialize.Tests.csproj", "{7FBCCE5C-7FB3-4441-BEF9-D031318DC8D1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueDB.Communication.Tests", "Communication\BlueDB.Communication.Tests\BlueDB.Communication.Tests.csproj", "{4F6BDB6D-9DF1-4D60-BF56-901AD3EFE2F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{7FBCCE5C-7FB3-4441-BEF9-D031318DC8D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7FBCCE5C-7FB3-4441-BEF9-D031318DC8D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7FBCCE5C-7FB3-4441-BEF9-D031318DC8D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F6BDB6D-9DF1-4D60-BF56-901AD3EFE2F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F6BDB6D-9DF1-4D60-BF56-901AD3EFE2F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F6BDB6D-9DF1-4D60-BF56-901AD3EFE2F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F6BDB6D-9DF1-4D60-BF56-901AD3EFE2F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,6 +54,7 @@ Global
 		{4C51E83E-9033-4929-8CE8-AD8D774D2190} = {FE816180-1E65-47B7-A540-9D9EC0F271A9}
 		{35CBCF48-C8DB-4E2A-82EB-962EEA694532} = {E3EF424A-D659-46CE-9F81-6C754876E9BB}
 		{7FBCCE5C-7FB3-4441-BEF9-D031318DC8D1} = {E3EF424A-D659-46CE-9F81-6C754876E9BB}
+		{4F6BDB6D-9DF1-4D60-BF56-901AD3EFE2F1} = {45F6342B-09C2-46ED-ADE8-58735DCEDE9B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5F7DE442-1D44-4691-9FB9-BFE65D741DC7}

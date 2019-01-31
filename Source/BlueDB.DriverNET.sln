@@ -9,7 +9,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02 - Driver .NET", "02 - Dr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlueDB.DriverNET.ClientTest", "DriverNET\BlueDB.DriverNET.ClientTest\BlueDB.DriverNET.ClientTest.csproj", "{098FB00D-2860-4717-9D43-715D7A798DA6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueDB.DriverNET", "DriverNET\BlueDB.DriverNET\BlueDB.DriverNET.csproj", "{9F86C09E-71D6-440B-A22A-A6E01227B250}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlueDB.DriverNET", "DriverNET\BlueDB.DriverNET\BlueDB.DriverNET.csproj", "{9F86C09E-71D6-440B-A22A-A6E01227B250}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04 - Communication", "04 - Communication", "{0962F5DB-4FE4-4656-8A0C-022EBF6C92E1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlueDB.Communication", "Communication\BlueDB.Communication\BlueDB.Communication.csproj", "{3E3F6A56-D7B9-444E-B58A-E709A43F3574}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03 - Serialize", "03 - Serialize", "{4E63D7AE-5FB4-4219-ABDD-E83E2EB0ECF5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlueDB.Serialize", "Serialize\BlueDB.Serialize\BlueDB.Serialize.csproj", "{00272D0B-3EEE-49FF-9090-36DC8A6591B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,6 +33,14 @@ Global
 		{9F86C09E-71D6-440B-A22A-A6E01227B250}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F86C09E-71D6-440B-A22A-A6E01227B250}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F86C09E-71D6-440B-A22A-A6E01227B250}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E3F6A56-D7B9-444E-B58A-E709A43F3574}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E3F6A56-D7B9-444E-B58A-E709A43F3574}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E3F6A56-D7B9-444E-B58A-E709A43F3574}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E3F6A56-D7B9-444E-B58A-E709A43F3574}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00272D0B-3EEE-49FF-9090-36DC8A6591B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00272D0B-3EEE-49FF-9090-36DC8A6591B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00272D0B-3EEE-49FF-9090-36DC8A6591B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00272D0B-3EEE-49FF-9090-36DC8A6591B6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -32,6 +48,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{098FB00D-2860-4717-9D43-715D7A798DA6} = {9A01315E-C5B9-40F0-A6AD-B77BA7C032C3}
 		{9F86C09E-71D6-440B-A22A-A6E01227B250} = {4D7B5086-F650-4C65-9407-1EF9B3B1E786}
+		{3E3F6A56-D7B9-444E-B58A-E709A43F3574} = {0962F5DB-4FE4-4656-8A0C-022EBF6C92E1}
+		{00272D0B-3EEE-49FF-9090-36DC8A6591B6} = {4E63D7AE-5FB4-4219-ABDD-E83E2EB0ECF5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E71A8A93-B851-4373-9F1C-6EA429EAAAAF}
