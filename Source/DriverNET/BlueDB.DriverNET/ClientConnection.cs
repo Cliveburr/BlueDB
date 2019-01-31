@@ -2,7 +2,7 @@
 
 namespace BlueDB.DriverNET
 {
-    public class SocketClient
+    public class ClientConnection
     {
     }
 }

@@ -1,3 +1,4 @@
+using BlueDB.Communication.Socket;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 
@@ -24,13 +25,13 @@ namespace BlueDB.Communication.Tests
 
         private void TestValue(ushort value)
         {
-            var settingsFalse = SocketMessage.SetPackageSettings(value, false);
-            var settingsBackFalse = SocketMessage.GetPackageSettings(settingsFalse);
+            var settingsFalse = PackageMessage.SetPackageSettings(value, false);
+            var settingsBackFalse = PackageMessage.GetPackageSettings(settingsFalse);
             Assert.AreEqual(value, settingsBackFalse.Item1);
             Assert.IsFalse(settingsBackFalse.Item2);
 
-            var settingsTrue = SocketMessage.SetPackageSettings(value, true);
-            var settingsBackTrue = SocketMessage.GetPackageSettings(settingsTrue);
+            var settingsTrue = PackageMessage.SetPackageSettings(value, true);
+            var settingsBackTrue = PackageMessage.GetPackageSettings(settingsTrue);
             Assert.AreEqual(value, settingsBackTrue.Item1);
             Assert.IsTrue(settingsBackTrue.Item2);
         }

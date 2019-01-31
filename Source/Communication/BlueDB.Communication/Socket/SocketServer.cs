@@ -6,19 +6,20 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BlueDB.Communication
+namespace BlueDB.Communication.Socket
 {
     public class SocketServer
     {
         public IPHostEntry IPHostEntry { get; private set; }
         public IPEndPoint IPEndPoint { get; private set; }
-        public Socket Listener { get; private set; }
-        public List<SocketClientHandler> Clients { get; private set; }
+        public System.Net.Sockets.Socket Listener { get; private set; }
+        public List<SocketServerConnection> Connections { get; private set; }
         public int BufferSize { get; set; }
+        public Action<SocketServerConnection, ReceiveMessage, Action<SendMessage>> BeginMessageProcess { get; set; }
 
         public SocketServer()
         {
-            Clients = new List<SocketClientHandler>();
+            Connections = new List<SocketServerConnection>();
             BufferSize = 1024;
         }
 
@@ -27,7 +28,7 @@ namespace BlueDB.Communication
             IPHostEntry = Dns.GetHostEntry(Dns.GetHostName());
             var ipAddress = IPHostEntry.AddressList[0];
 
-            Listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            Listener = new System.Net.Sockets.Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
             IPEndPoint = new IPEndPoint(ipAddress, port);
             Listener.Bind(IPEndPoint);
@@ -45,7 +46,7 @@ namespace BlueDB.Communication
                 IPEndPoint = null;
                 Listener = null;
             }
-            Clients.ForEach(c => c.Stop());
+            Connections.ForEach(c => c.Stop());
         }
 
         private void AcceptCallback(IAsyncResult ar)
@@ -54,16 +55,16 @@ namespace BlueDB.Communication
 
             Listener.BeginAccept(new AsyncCallback(AcceptCallback), null);
 
-            var clientHandler = new SocketClientHandler(handler, this);
+            var clientHandler = new SocketServerConnection(handler, this);
             clientHandler.OnClose += OnClientHandler_Close;
-            Clients.Add(clientHandler);
+            Connections.Add(clientHandler);
 
             clientHandler.Start();
         }
 
-        private void OnClientHandler_Close(SocketClientHandler sender)
+        private void OnClientHandler_Close(SocketServerConnection sender)
         {
-            Clients.Remove(sender);
+            Connections.Remove(sender);
         }
     }
 }
