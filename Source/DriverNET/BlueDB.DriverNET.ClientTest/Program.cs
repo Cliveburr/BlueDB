@@ -17,13 +17,33 @@ namespace BlueDB.DriverNET.ClientTest
 
         static void Main(string[] args)
         {
-            var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            var ipAddress = ipHostInfo.AddressList[0];
-            var remoteEP = new IPEndPoint(ipAddress, 8011);
+            using (var connection = new ClientConnection("127.0.0.1", 8011))
+            {
+                var data = GetTestMessage();
 
-            client = new SocketClient(remoteEP);
+                connection.Client.SendMessage(data, (response) =>
+                {
 
-            client.Connect(ConnectCallback);
+                    for (var i = 0; i < data.Bytes.Length; i++)
+                    {
+                        if (data.Bytes[i] != response.Bytes[i])
+                        {
+                            throw new Exception();
+                        }
+                    }
+                });
+
+            }
+
+
+
+            //var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+            //var ipAddress = ipHostInfo.AddressList[0];
+            //var remoteEP = new IPEndPoint(ipAddress, 8011);
+
+            //client = new SocketClient(remoteEP);
+
+            //client.Connect(ConnectCallback);
 
             Console.ReadKey();
         }
