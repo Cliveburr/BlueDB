@@ -14,7 +14,7 @@ namespace BlueDB.Host
 
             server.BeginMessageProcess = MessageProcess;
 
-            server.Start(8011);
+            server.Start("127.0.0.1", 8011);
 
             Console.ReadKey();
         }

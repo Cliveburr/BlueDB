@@ -53,7 +53,10 @@ namespace BlueDB.Communication.Socket
                 Buffer = new byte[Server.BufferSize]
             });
 
-            Server.BeginMessageProcess?.Invoke(this, message, MessageProcessCallback);
+            if (message.GetBytes.Length > 0)
+            {
+                Server.BeginMessageProcess?.Invoke(this, message, MessageProcessCallback);
+            }
         }
 
         private void MessageProcessCallback(SendMessage message)

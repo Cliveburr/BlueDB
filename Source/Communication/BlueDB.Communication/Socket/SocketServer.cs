@@ -10,7 +10,6 @@ namespace BlueDB.Communication.Socket
 {
     public class SocketServer
     {
-        public IPHostEntry IPHostEntry { get; private set; }
         public IPEndPoint IPEndPoint { get; private set; }
         public System.Net.Sockets.Socket Listener { get; private set; }
         public List<SocketServerConnection> Connections { get; private set; }
@@ -23,14 +22,16 @@ namespace BlueDB.Communication.Socket
             BufferSize = 1024;
         }
 
-        public void Start(int port)
+        public void Start(string address, int port)
         {
-            IPHostEntry = Dns.GetHostEntry(Dns.GetHostName());
-            var ipAddress = IPHostEntry.AddressList[0];
+            Start(IPAddress.Parse(address), port);
+        }
 
-            Listener = new System.Net.Sockets.Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+        public void Start(IPAddress address, int port)
+        {
+            Listener = new System.Net.Sockets.Socket(address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
-            IPEndPoint = new IPEndPoint(ipAddress, port);
+            IPEndPoint = new IPEndPoint(address, port);
             Listener.Bind(IPEndPoint);
             Listener.Listen(100);
 
@@ -42,7 +43,6 @@ namespace BlueDB.Communication.Socket
             if (Listener?.Connected ?? false)
             {
                 Listener.Close();
-                IPHostEntry = null;
                 IPEndPoint = null;
                 Listener = null;
             }

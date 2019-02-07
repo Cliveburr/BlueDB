@@ -22,6 +22,8 @@ namespace BlueDB.Communication.Socket
             _handles = new Dictionary<ushort, MessageHandle>();
         }
 
+        public bool IsConnected { get { return Socket.Connected; } }
+
         public void Connect(Action connectedCallback)
         {
             Socket.BeginConnect(_ipEndPoint, new AsyncCallback(ConnectCallback), connectedCallback);

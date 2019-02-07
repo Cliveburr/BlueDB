@@ -13,71 +13,124 @@ namespace BlueDB.DriverNET.ClientTest
 {
     class Program
     {
-        private static SocketClient client;
-
         static void Main(string[] args)
         {
             using (var connection = new ClientConnection("127.0.0.1", 8011))
             {
-                var data = GetTestMessage();
+                TestOne(connection);
 
-                connection.Client.SendMessage(data, (response) =>
-                {
-
-                    for (var i = 0; i < data.Bytes.Length; i++)
-                    {
-                        if (data.Bytes[i] != response.Bytes[i])
-                        {
-                            throw new Exception();
-                        }
-                    }
-                });
-
+                TestRefrence(connection);
             }
-
-
-
-            //var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            //var ipAddress = ipHostInfo.AddressList[0];
-            //var remoteEP = new IPEndPoint(ipAddress, 8011);
-
-            //client = new SocketClient(remoteEP);
-
-            //client.Connect(ConnectCallback);
 
             Console.ReadKey();
         }
 
-        private static void ConnectCallback()
+        static void TestOne(ClientConnection connection)
         {
-            var data = GetTestMessage();
+            var accessDatabase = connection.CreateRequest()
+                .WithDatabase("Test0")
+                .Process();
 
-            client.SendMessage(data, (response) =>
-            {
-
-                for (var i = 0; i < data.Bytes.Length; i++)
+            var inserOneToTableUserTest = connection.CreateRequest()
+                .WithDatabase("Test0")
+                .WithTable("UserTest")
+                .Set(new BlueProperty[]
                 {
-                    if (data.Bytes[i] != response.Bytes[i])
-                    {
-                        throw new Exception();
-                    }
-                }
-            });
+                    new BlueProperty(PropertyType.Int32, "_id", 0),
+                    new BlueProperty(PropertyType.String, "name", "teste numero um"),
+                    new BlueProperty(PropertyType.Int32, "valor", 100)
+                })
+                .Set(new BlueProperty[]
+                {
+                    new BlueProperty(PropertyType.Int32, "_id", 0),
+                    new BlueProperty(PropertyType.String, "name", "teste numero dois"),
+                    new BlueProperty(PropertyType.Int32, "valor", 110)
+                })
+                .Set(new BlueProperty[]
+                {
+                    new BlueProperty(PropertyType.Int32, "_id", 0),
+                    new BlueProperty(PropertyType.String, "name", "teste numero tres"),
+                    new BlueProperty(PropertyType.Int32, "valor", 200)
+                })
+                .Process();
+
+            var selectInTableUserTest = connection.CreateRequest()
+                .WithDatabase("Test0")
+                .WithTable("UserTest")
+                .Where("valor", 100)
+                .Or().Where("valor", 110)
+                .Select()
+                .Process();
+
+            var removeFromTableUserTest = connection.CreateRequest()
+                .WithDatabase("Test0")
+                .WithTable("UserTest")
+                .Where("valor", 100)
+                .Remove()
+                .Process();
         }
 
-        private static MessageData GetTestMessage()
+        static void TestRefrence(ClientConnection connection)
         {
-            var rnd = new Random((int)DateTime.Now.Ticks);
+            // filtra um item da tabela UserTest
+            // cria um registro na tabela UserExtraData com um vinculo para o item filtrado
+            // e faz um update do item filtrado adicionado o link para o registro criado
+            var insertIntoUserExtraData = connection.CreateRequest()
+                .WithDatabase("Test0")
+                .WithTable("UserTest", true)    // coloca a tabela UserTest como selecionada e todos seus registros como selecionados (true força selecionar todos registros)
+                .First("_id", 2)                // filtra a tabela UserTest e coloca o resultado como selecionado
+                .WithTable("UserExtraData")     // coloca a tabela UserExtraData como selecionada
+                .Set(new BlueProperty[]         // adiciona um registro na tabela UserExtraData (selecionada) com um link para o campo user (selecionado) e coloca esse registro como selecionado
+                {
+                    new BlueProperty(PropertyType.Int32, "_id", 0),     // _id = 0 indica que é um registro novo, create
+                    new BlueProperty(PropertyType.String, "address", "rua qualquer lugar"),
+                    new BlueProperty(PropertyType.String, "zip", "14060-140"),
+                    new BlueProperty(PropertyType.Link, "user", "UserTest")
+                })
+                .WithTable("UserTest")         // coloca a tabela UserTest como selecionada
+                .Set(new BlueProperty[]        // faz create/update das propriedades de todos registros selecionados da tabela UserTest
+                {
+                    new BlueProperty(PropertyType.Link, "data", "UserExtraData")
+                })
+                .Process();
 
-            var bytes = Enumerable.Range(0, 100000)
-                    .Select(n => (byte)rnd.Next(0, 256))
-                    .ToArray();
+            var updateOneToTableUserTest = connection.CreateRequest()
+                .WithDatabase("Test0")
+                .WithTable("Build")                             // coloca a tabela Build como selecionada e todos seus registros selecionados
+                .Where("_id", Expression.Equal(10))             // filtra a tabela selecionada e coloca o resultado como selecionados
+                .First()                                        // seleciona o primeiro item dos selecionados, emite erro se não tiver
+                .WithTable("BuildModule")                       // coloca a tabela BuildModule como selecionada e todos seus registros selecionados
+                //.WhereTableEqual("idBuild", "Build", "_id")     // filtra a tabela selecionada com a tabela "Build" e coloca o resultado selecionado
+                .Select("Build")                                // retorna os registros selecionados da tabela Build
+                .Select("BuildModule")                          // retorna os registros selecionados da tabela BuildModule
+                .Where("idBuild", Expression.Equal(Expression.Table("Build", "_id")))
+                .Process();
 
-            return new MessageData
-            {
-                TextView = "um textinho teste!",
-                Bytes = bytes
-            };
+            var selectLinkToTableUserTest = connection.CreateRequest()
+                .WithDatabase("Test0")
+                .WithTable("Build")
+                .Where("_id", Expression.Equal(10))
+                .First()
+                .WithLink("modules")
+                .Select("BuildModule")
+                .Process();
+        }
+    }
+
+    public enum PropertyType : byte
+    {
+        Invalid = 0,
+        Byte = 1,
+        Int32 = 2,
+        String = 3,
+        Link = 4
+    }
+
+    public class BlueProperty
+    {
+        public BlueProperty(PropertyType type, string name, object value)
+        {
+
         }
     }
 }

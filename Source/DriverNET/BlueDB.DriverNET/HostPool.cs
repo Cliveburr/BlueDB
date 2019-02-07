@@ -1,4 +1,5 @@
-﻿using BlueDB.Communication.Socket;
+﻿using BlueDB.Communication.Messages;
+using BlueDB.Communication.Socket;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -13,21 +14,35 @@ namespace BlueDB.DriverNET
         public IPEndPoint EndPoint { get; internal set; }
         public SocketClient Client { get; internal set; }
 
-        private ManualResetEvent _connectSync;
-
         public HostPool(IPEndPoint endPoint)
         {
             EndPoint = endPoint;
             Client = new SocketClient(endPoint);
-
-            _connectSync = new ManualResetEvent(false);
-            Client.Connect(new Action(ConnectCallback));
-            _connectSync.WaitOne();
         }
 
-        private void ConnectCallback()
+        public void Release()
         {
-            _connectSync.Set();
+            HostStorage.Release(this);
+        }
+
+        private void CheckConnect(Action callBack)
+        {
+            if (Client.IsConnected)
+            {
+                callBack();
+            }
+            else
+            {
+                Client.Connect(callBack);
+            }
+        }
+
+        public void SendMessage(MessageData data, Action<MessageData> callBack)
+        {
+            CheckConnect(() =>
+            {
+                Client.SendMessage(data, callBack);
+            });
         }
     }
 }

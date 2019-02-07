@@ -44,6 +44,7 @@ namespace BlueDB.Communication.Socket
             catch (Exception err)
             {
                 HandleReceiveError(err);
+                bytesRead = 0;
             }
 
             if (bytesRead > 0)
@@ -71,6 +72,7 @@ namespace BlueDB.Communication.Socket
 
         protected virtual void HandleReceiveError(Exception err)
         {
+            Console.Write(err.ToString());
         }
 
         public void SendMessage(SendMessage message)
