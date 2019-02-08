@@ -14,11 +14,13 @@ namespace BlueDB.Communication.Socket
 
         public SocketServer Server { get; private set; }
 
+        private Dictionary<string, object> _bag;
 
         public SocketServerConnection(System.Net.Sockets.Socket socket, SocketServer server)
             : base(socket)
         {
             Server = server;
+            _bag = new Dictionary<string, object>();
         }
 
         public void Start()
@@ -66,6 +68,27 @@ namespace BlueDB.Communication.Socket
 
         protected override void MessageSent(SendMessage message)
         {
+        }
+
+        public void SetItemOnBag(string tag, object item)
+        {
+            if (_bag.ContainsKey(tag))
+            {
+                _bag.Remove(tag);
+            }
+            _bag.Add(tag, item);
+        }
+
+        public T GetItemOfBag<T>(string tag)
+        {
+            if (_bag.ContainsKey(tag))
+            {
+                return (T)_bag[tag];
+            }
+            else
+            {
+                return default(T);
+            }
         }
     }
 }

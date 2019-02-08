@@ -4,8 +4,10 @@ using System.Text;
 
 namespace BlueDB.Communication.Messages.Commands
 {
-    public interface ICommand
+    public enum CommandType : ushort
     {
-        CommandType Type { get; }
+        Invalid = 0,
+        WithDatabase = 1,
+        WithTable = 2
     }
 }
