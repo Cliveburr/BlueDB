@@ -5,8 +5,9 @@ using System.Text;
 
 namespace BlueDB.Communication.Messages
 {
-    public class MessageReponse : MessageData
+    public class MessageReponse
     {
+        public ushort Id { get; set; }
         public IResults[] Results { get; set; }
         public string Error { get; set; }
     }

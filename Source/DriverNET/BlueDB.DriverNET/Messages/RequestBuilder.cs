@@ -1,4 +1,5 @@
-﻿using BlueDB.Communication.Messages;
+﻿using BlueDB.Communication.Entity;
+using BlueDB.Communication.Messages;
 using BlueDB.Communication.Messages.Commands;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,32 @@ namespace BlueDB.DriverNET.Messages
 
         public RequestBuilder WithDatabase(string databaseName)
         {
+            _commands.Add(new WithDatabaseCommand
+            {
+                DatabaseName = databaseName
+            });
+
+            return this;
+        }
+
+        public RequestBuilder WithTable(string tableName, bool clearSelection = false)
+        {
+            _commands.Add(new WithTableCommand
+            {
+                TableName = tableName,
+                ClearSelection = clearSelection
+            });
+
+            return this;
+        }
+
+        public RequestBuilder Set(params Property[] properties)
+        {
+            _commands.Add(new SetCommand
+            {
+                Properties = properties
+            });
+
             return this;
         }
 

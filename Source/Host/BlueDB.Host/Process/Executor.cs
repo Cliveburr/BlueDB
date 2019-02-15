@@ -1,8 +1,8 @@
 ﻿using BlueDB.Communication.Messages;
 using BlueDB.Communication.Messages.Commands;
 using BlueDB.Communication.Messages.Results;
-using BlueDB.Host.Context;
 using BlueDB.Host.Process.Commands;
+using BlueDB.Host.Transaction;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,9 +13,9 @@ namespace BlueDB.Host.Process
     public class Executor
     {
         public ProcessContext ProcessContext { get; private set; }
-        public Dictionary<string, DatabaseExecutor> Databases { get; set; }
-        public DatabaseExecutor DatabaseSelected { get; set; }
         public List<IResults> Results { get; set; }
+        public DatabaseInter DatabaseSelected { get; set; }
+
 
         private int _commandIndex;
         private Exception _error;
@@ -23,10 +23,7 @@ namespace BlueDB.Host.Process
         public Executor(ProcessContext processContext)
         {
             ProcessContext = processContext;
-            Databases = new Dictionary<string, DatabaseExecutor>();
             Results = new List<IResults>();
-
-            ProcessContext.Executor = this;
 
             Task.Run(new Action(Execute));
         }
@@ -34,30 +31,35 @@ namespace BlueDB.Host.Process
         public void ExecuteNextCommand()
         {
             _commandIndex++;
-            Execute();
+            Task.Run(new Action(Execute));
         }
 
         private void Execute()
         {
-            if (_commandIndex >= ProcessContext.ConnectionContext.Request.Commands.Length)
+            if (_commandIndex >= ProcessContext.Request.Commands.Length)
             {
                 FinishExecute();
                 return;
             }
 
-            var command = ProcessContext.ConnectionContext.Request.Commands[_commandIndex];
+            var command = ProcessContext.Request.Commands[_commandIndex];
 
-            switch (command.Type)
+            try
             {
-                case CommandType.WithDatabase:
-                    {
-                        WithDatabaseProcess.Execute(this, command as WithDatabaseCommand);
-                        break;
-                    }
-                case CommandType.WithTable:
-                    {
-                        break;
-                    }
+                switch (command.Type)
+                {
+                    case CommandType.ReleaseConnection: ReleaseConnectionProcess.Execute(this, command as ReleaseConnectionCommand); break;
+                    case CommandType.OpenTransaction: OpenTransactionProcess.Execute(this, command as OpenTransactionCommand); break;
+                    case CommandType.CommitTransaction: CommitTransactionProcess.Execute(this, command as CommitTransactionCommand); break;
+                    case CommandType.RollbackTransaction: RollbackTransactionProcess.Execute(this, command as RollbackTransactionCommand); break;
+                    case CommandType.WithDatabase: WithDatabaseProcess.Execute(this, command as WithDatabaseCommand); break;
+                    case CommandType.WithTable: WithTableProcess.Execute(this, command as WithTableCommand); break;
+                    case CommandType.Set: SetProcess.Execute(this, command as SetCommand); break;
+                }
+            }
+            catch (Exception err)
+            {
+                HandleExecuteError(err);
             }
         }
 
@@ -65,11 +67,20 @@ namespace BlueDB.Host.Process
         {
             var response = new MessageReponse
             {
+                Id = ProcessContext.Request.Id,
                 Results = Results.ToArray(),
-                Error =  _error.Message
+                Error =  _error?.Message
             };
 
+            ProcessContext.Callback(response);
+
             ExecutorController.Instance.ReleaseExecutor(this);
+        }
+
+        public void HandleExecuteError(Exception err)
+        {
+            _error = err;
+            FinishExecute();
         }
     }
 }

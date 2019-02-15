@@ -37,10 +37,7 @@ namespace BlueDB.Communication.Socket
 
                 Socket.EndConnect(ar);
 
-                BeginReceive(new ReceiveMessage
-                {
-                    Buffer = new byte[2048]
-                });
+                BeginReceive();
 
                 connectedCallback();
             }
@@ -52,33 +49,32 @@ namespace BlueDB.Communication.Socket
             }
         }
 
-        public void SendMessage(MessageData data, Action<MessageData> sentCallback)
+        public void SendMessage(MessageRequest request, Action<MessageReponse> sentCallback)
         {
-            data.Id = ++_messageIdIndex;
+            request.Id = ++_messageIdIndex;
 
-            var serialize = BinarySerialize.From<MessageData>();
-            var bytes = serialize.Serialize(data);
-            var request = new SendMessage(bytes);
+            var serializeType = BinarySerialize.From<MessageRequest>();
+            var bytes = serializeType.Serialize(request);
 
             var handle = new MessageHandle
             {
-                Id = data.Id,
-                Request = data,
+                Id = request.Id,
+                Request = request,
                 SentCallback = sentCallback
             };
-            _handles.Add(data.Id, handle);
+            _handles.Add(request.Id, handle);
 
-            SendMessage(request);
+            Send(bytes);
         }
 
-        protected override void MessageSent(SendMessage message)
+        protected override void OnSent(byte[] bytes)
         {
         }
 
-        protected override void FinishReceiving(ReceiveMessage message)
+        protected override void OnReceived(byte[] bytes)
         {
-            var serialize = BinarySerialize.From<MessageData>();
-            var response = serialize.Deserialize(message.GetBytes);
+            var serializeType = BinarySerialize.From<MessageReponse>();
+            var response = serializeType.Deserialize(bytes);
 
             var handle = _handles[response.Id];
             _handles.Remove(response.Id);
@@ -91,8 +87,8 @@ namespace BlueDB.Communication.Socket
     public class MessageHandle
     {
         public ushort Id { get; set; }
-        public MessageData Request { get; set; }
-        public MessageData Response { get; set; }
-        public Action<MessageData> SentCallback { get; set; }
+        public MessageRequest Request { get; set; }
+        public MessageReponse Response { get; set; }
+        public Action<MessageReponse> SentCallback { get; set; }
     }
 }

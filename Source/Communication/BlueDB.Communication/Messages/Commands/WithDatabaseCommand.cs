@@ -9,14 +9,5 @@ namespace BlueDB.Communication.Messages.Commands
         public CommandType Type => CommandType.WithDatabase;
 
         public string DatabaseName { get; set; }
-
-        public WithDatabaseCommand()
-        {
-        }
-
-        public WithDatabaseCommand(string databaseName)
-        {
-            DatabaseName = databaseName;
-        }
     }
 }

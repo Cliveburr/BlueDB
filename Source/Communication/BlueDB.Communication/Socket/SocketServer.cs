@@ -1,10 +1,9 @@
-﻿using System;
+﻿using BlueDB.Communication.Messages;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BlueDB.Communication.Socket
 {
@@ -13,13 +12,11 @@ namespace BlueDB.Communication.Socket
         public IPEndPoint IPEndPoint { get; private set; }
         public System.Net.Sockets.Socket Listener { get; private set; }
         public List<SocketServerConnection> Connections { get; private set; }
-        public int BufferSize { get; set; }
-        public Action<SocketServerConnection, ReceiveMessage, Action<SendMessage>> BeginMessageProcess { get; set; }
+        public Action<SocketServerConnection, MessageRequest, Action<MessageReponse>> BeginMessageProcess { get; set; }
 
         public SocketServer()
         {
             Connections = new List<SocketServerConnection>();
-            BufferSize = 1024;
         }
 
         public void Start(string address, int port)

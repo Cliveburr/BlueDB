@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BlueDB.Communication.Messages;
+using BlueDB.Serialize;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
@@ -25,10 +27,7 @@ namespace BlueDB.Communication.Socket
 
         public void Start()
         {
-            BeginReceive(new ReceiveMessage
-            {
-                Buffer = new byte[Server.BufferSize]
-            });
+            BeginReceive();
         }
 
         public void Stop()
@@ -48,29 +47,35 @@ namespace BlueDB.Communication.Socket
             Server.Connections.Remove(this);
         }
 
-        protected override void FinishReceiving(ReceiveMessage message)
+        protected override void OnReceived(byte[] bytes)
         {
-            BeginReceive(new ReceiveMessage
+            if (bytes.Length > 0)
             {
-                Buffer = new byte[Server.BufferSize]
-            });
+                var serializeType = BinarySerialize.From<MessageRequest>();
+                var request = serializeType.Deserialize(bytes);
 
-            if (message.GetBytes.Length > 0)
-            {
-                Server.BeginMessageProcess?.Invoke(this, message, MessageProcessCallback);
+                Server.BeginMessageProcess?.Invoke(this, request, MessageProcessCallback);
             }
         }
 
-        private void MessageProcessCallback(SendMessage message)
+        private void MessageProcessCallback(MessageReponse response)
         {
-            SendMessage(message);
+            var serializeType = BinarySerialize.From<MessageReponse>();
+            var bytes = serializeType.Serialize(response);
+
+            Send(bytes);
         }
 
-        protected override void MessageSent(SendMessage message)
+        protected override void OnSent(byte[] bytes)
         {
         }
 
-        public void SetItemOnBag(string tag, object item)
+        protected override void HandleSendError(Exception err)
+        {
+            //TODO:
+        }
+
+        public void SetItemInBag(string tag, object item)
         {
             if (_bag.ContainsKey(tag))
             {
@@ -79,7 +84,7 @@ namespace BlueDB.Communication.Socket
             _bag.Add(tag, item);
         }
 
-        public T GetItemOfBag<T>(string tag)
+        public T GetItemInBag<T>(string tag)
         {
             if (_bag.ContainsKey(tag))
             {
@@ -89,6 +94,21 @@ namespace BlueDB.Communication.Socket
             {
                 return default(T);
             }
+        }
+
+        public bool ContainsItemInBag(string tag)
+        {
+            return _bag.ContainsKey(tag);
+        }
+
+        public void RemoteItemInBag(string tag)
+        {
+            _bag.Remove(tag);
+        }
+
+        public void CleanBag()
+        {
+            _bag = new Dictionary<string, object>();
         }
     }
 }

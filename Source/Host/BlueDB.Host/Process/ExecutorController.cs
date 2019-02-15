@@ -1,5 +1,4 @@
-﻿using BlueDB.Host.Context;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,6 +33,7 @@ namespace BlueDB.Host.Process
             _processLock = new object();
             _maxExecutor = 5;
             _executors = new List<Executor>();
+            _tablesLocked = new List<string>();
         }
 
         public void ScheduleToProcess(ProcessContext request)
@@ -63,9 +63,9 @@ namespace BlueDB.Host.Process
                 _tablesLocked.AddRange(request.TablesToLock);
                 var executor = new Executor(request);
                 _executors.Add(executor);
-            }
 
-            RunNextRequest();
+                RunNextRequest();
+            }
         }
 
         private ProcessContext GetNextPossibleRequest()
@@ -92,12 +92,15 @@ namespace BlueDB.Host.Process
             {
                 _executors.Remove(executor);
 
-                foreach (var table in executor.ProcessContext.TablesToLock)
-                {
-                    _tablesLocked.Remove(table);
-                }
-
                 RunNextRequest();
+            }
+        }
+
+        public void ReleaseTables(string[] tables)
+        {
+            foreach (var table in tables)
+            {
+                _tablesLocked.Remove(table);
             }
         }
     }

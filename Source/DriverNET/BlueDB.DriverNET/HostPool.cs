@@ -37,7 +37,7 @@ namespace BlueDB.DriverNET
             }
         }
 
-        public void SendMessage(MessageData data, Action<MessageData> callBack)
+        public void SendMessage(MessageRequest data, Action<MessageReponse> callBack)
         {
             CheckConnect(() =>
             {

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using BlueDB.Communication.Messages.Commands;
+using BlueDB.Host.Enums;
+using BlueDB.Host.Transaction;
 
 namespace BlueDB.Host.Process.Commands
 {
@@ -9,20 +11,14 @@ namespace BlueDB.Host.Process.Commands
     {
         public static void Execute(Executor executor, WithDatabaseCommand withDatabaseCommand)
         {
-            // verifica se já abriu essa database nesse contexto
+            var transaction = executor.ProcessContext.Connection.GetItemInBag<TransactionOperation>(BagNames.TRANSACTION);
 
-            // coloca essa database como selecionada no contexto
-
-            if (!executor.Databases.ContainsKey(withDatabaseCommand.DatabaseName))
+            transaction.OpenDatabase(withDatabaseCommand.DatabaseName, (database) =>
             {
-                var newDatabase = new DatabaseExecutor(executor, withDatabaseCommand.DatabaseName);
-                executor.Databases.Add(withDatabaseCommand.DatabaseName, newDatabase);
-            }
-            executor.DatabaseSelected = _databases[databaseName];
+                executor.DatabaseSelected = database;
 
-            // precisa ser async
-
-            executor.ExecuteNextCommand();
+                executor.ExecuteNextCommand();
+            });
         }
     }
 }

@@ -1,73 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace BlueDB.Communication.Socket
 {
-    public abstract class BaseSocket
+    public abstract class BaseSocket : MessageProtocol
     {
         public System.Net.Sockets.Socket Socket { get; protected set; }
 
-        private Queue<SendMessage> _sendMessages;
-        private bool _isSendingMessage;
-        private object _isSendingLock;
+        public int ReceiveBufferSize { get; set; }
 
         public BaseSocket(System.Net.Sockets.Socket socket)
         {
             Socket = socket;
-            _sendMessages = new Queue<SendMessage>();
-            _isSendingMessage = false;
-            _isSendingLock = new object();
+
+            ReceiveBufferSize = 1024;
         }
 
-        protected void BeginReceive(ReceiveMessage message)
+        protected void BeginReceive()
         {
             try
             {
-                Socket.BeginReceive(message.Buffer, 0, message.Buffer.Length, 0, new AsyncCallback(ReceiveCallback), message);
+                var buffer = new byte[ReceiveBufferSize];
+
+                Socket.BeginReceive(buffer, 0, ReceiveBufferSize, 0, new AsyncCallback(ReceiveCallback), buffer);
             }
             catch (Exception err)
             {
-                HandleReceiveError(err);
+                Task.Run(() => HandleReceiveError(err));
             }
         }
 
         private void ReceiveCallback(IAsyncResult ar)
         {
-            var message = (ReceiveMessage)ar.AsyncState;
+            var bytes = (byte[])ar.AsyncState;
             var bytesRead = 0;
 
             try
             {
                 bytesRead = Socket.EndReceive(ar);
+
+                Receive(bytes, bytesRead);
             }
             catch (Exception err)
             {
-                HandleReceiveError(err);
-                bytesRead = 0;
+                Task.Run(() => HandleReceiveError(err));
             }
 
-            if (bytesRead > 0)
-            {
-                message.WriteBufferToStream(0, bytesRead);
-
-                if (message.IsReceived)
-                {
-                    FinishReceiving(message);
-                }
-                else
-                {
-                    BeginReceive(message);
-                }
-            }
-            else
-            {
-                FinishReceiving(message);
-            }
-        }
-
-        protected virtual void FinishReceiving(ReceiveMessage message)
-        {
+            BeginReceive();
         }
 
         protected virtual void HandleReceiveError(Exception err)
@@ -75,59 +56,46 @@ namespace BlueDB.Communication.Socket
             Console.Write(err.ToString());
         }
 
-        public void SendMessage(SendMessage message)
+        protected override void ProcessSend(byte[] bytes)
         {
-            _sendMessages.Enqueue(message);
-
-            CheckForSendMessage();
-        }
-
-        private void CheckForSendMessage()
-        {
-            lock (_isSendingLock)
+            try
             {
-                if (_isSendingMessage)
-                {
-                    return;
-                }
-                _isSendingMessage = true;
+                Socket.BeginSend(bytes, 0, bytes.Length, 0, new AsyncCallback(SendCallback), bytes);
             }
-
-            if (_sendMessages.Count > 0)
+            catch (Exception err)
             {
-                var message = _sendMessages.Dequeue();
-
-                Socket.BeginSend(message.Bytes, 0, message.Bytes.Length, 0, new AsyncCallback(SendCallback), message);
+                Task.Run(() => HandleSendError(err));
             }
         }
 
         private void SendCallback(IAsyncResult ar)
         {
-            lock (_isSendingLock)
-            {
-                _isSendingLock = false;
-            }
+            base.EndSend();
 
             try
             {
-                var message = ar.AsyncState as SendMessage;
+                var bytes = ar.AsyncState as byte[];
 
                 var bytesSent = Socket.EndSend(ar);
-                if (bytesSent != message.Bytes.Length)
+                if (bytesSent != bytes.Length)
                 {
                     throw new Exception("something wrong!");
                 }
 
-                message.IsSent = true;
-                MessageSent(message);
+                OnSent(bytes);
             }
-            catch (Exception e)
+            catch (Exception err)
             {
-                Console.WriteLine(e.ToString());
+                Task.Run(() => HandleSendError(err));
             }
         }
 
-        protected virtual void MessageSent(SendMessage message)
+        protected virtual void HandleSendError(Exception err)
+        {
+            Console.Write(err.ToString());
+        }
+
+        protected virtual void OnSent(byte[] bytes)
         {
         }
     }

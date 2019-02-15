@@ -1,4 +1,5 @@
 ﻿using BlueDB.Communication.Messages;
+using BlueDB.Communication.Messages.Commands;
 using BlueDB.DriverNET.Messages;
 using System;
 using System.Net;
@@ -29,11 +30,25 @@ namespace BlueDB.DriverNET
 
         public void Dispose()
         {
+            var request = new MessageRequest
+            {
+                Commands = new ICommand[]
+                {
+                    new ReleaseConnectionCommand()
+                }
+            };
+
+            var response = SendMessage(request).Result;
+            if (!string.IsNullOrEmpty(response.Error))
+            {
+                //TODO: tratar erro ao soltar a connection
+            }
+
             _host.Release();
             _host = null;
         }
 
-        public void SendMessage(MessageRequest request, Action<MessageData> callBack)
+        public void SendMessage(MessageRequest request, Action<MessageReponse> callBack)
         {
             request.Id = ++_idsIndex;
 

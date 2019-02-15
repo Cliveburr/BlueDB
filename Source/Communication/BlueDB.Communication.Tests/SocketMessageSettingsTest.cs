@@ -25,15 +25,15 @@ namespace BlueDB.Communication.Tests
 
         private void TestValue(ushort value)
         {
-            var settingsFalse = PackageMessage.SetPackageSettings(value, false);
-            var settingsBackFalse = PackageMessage.GetPackageSettings(settingsFalse);
-            Assert.AreEqual(value, settingsBackFalse.Item1);
-            Assert.IsFalse(settingsBackFalse.Item2);
+            var settingsFalse = new PackageSettings(value, false);
+            var settingsBackFalse = new PackageSettings(settingsFalse.Settings);
+            Assert.AreEqual(value, settingsBackFalse.Lenght);
+            Assert.IsFalse(settingsBackFalse.HasMore);
 
-            var settingsTrue = PackageMessage.SetPackageSettings(value, true);
-            var settingsBackTrue = PackageMessage.GetPackageSettings(settingsTrue);
-            Assert.AreEqual(value, settingsBackTrue.Item1);
-            Assert.IsTrue(settingsBackTrue.Item2);
+            var settingsTrue = new PackageSettings(value, true);
+            var settingsBackTrue = new PackageSettings(settingsTrue.Settings);
+            Assert.AreEqual(value, settingsBackTrue.Lenght);
+            Assert.IsTrue(settingsBackTrue.HasMore);
         }
     }
 }

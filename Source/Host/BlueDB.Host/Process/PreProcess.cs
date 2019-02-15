@@ -1,6 +1,7 @@
-﻿using BlueDB.Host.Context;
+﻿using BlueDB.Communication.Messages.Commands;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace BlueDB.Host.Process
@@ -21,17 +22,50 @@ namespace BlueDB.Host.Process
             }
         }
 
-        public ProcessContext Compute(ConnectionContext context)
+        public void Compute(ProcessContext context)
         {
+            var hasTransactionCommand = false;
+
             foreach (var command in context.Request.Commands)
             {
 
+                if (command.Type == CommandType.OpenTransaction ||
+                    command.Type == CommandType.CommitTransaction ||
+                    command.Type == CommandType.RollbackTransaction)
+                {
+                    hasTransactionCommand = true;
+                }
             }
 
-            return new ProcessContext
+            context.TablesToRead = new string[0];
+            context.TablesToLock = new string[0];
+
+            var containsTransaction = context.Connection.ContainsItemInBag("Transaction");
+            if (!hasTransactionCommand && !containsTransaction)
             {
-                ConnectionContext = context
-            };
+                CreateVirtualTransaction(context);
+            }
+        }
+
+        private void CreateVirtualTransaction(ProcessContext context)
+        {
+            var listCommands = context.Request.Commands
+                .ToList();
+
+            listCommands
+                .Insert(0, new OpenTransactionCommand
+                {
+                    IsVirtual = true
+                });
+
+            listCommands
+                .Add(new CommitTransactionCommand
+                {
+                    IsVirtual = true
+                });
+
+            context.Request.Commands = listCommands
+                .ToArray();
         }
     }
 }

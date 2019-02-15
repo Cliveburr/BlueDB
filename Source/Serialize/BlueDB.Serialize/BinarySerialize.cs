@@ -45,6 +45,7 @@ namespace BlueDB.Serialize
             {
                 var genericNowType = typeof(ClassType<>).MakeGenericType(type);
                 knowType = (SerializeType)Activator.CreateInstance(genericNowType);
+                KnowTypes.Add(knowType);
             }
 
             if (knowType == null)

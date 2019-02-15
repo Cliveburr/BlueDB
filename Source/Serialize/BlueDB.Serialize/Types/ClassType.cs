@@ -23,6 +23,7 @@ namespace BlueDB.Serialize.Types
         private void ReadProperties()
         {
             Properties = Type.GetProperties()
+                .Where(p => p.CanWrite && p.CanRead)
                 .Select(p => new Tuple<SerializeType, PropertyInfo>(BinarySerialize.From(p.PropertyType), p))
                 .ToArray();
         }
