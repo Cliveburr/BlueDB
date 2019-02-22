@@ -1,17 +1,32 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
 namespace BlueDB.Serialize.Types
 {
-    public class InterfaceType : SerializeType<object>
+    public class InterfaceProvider : IProvider
     {
-        public override bool Test(Type type)
+        private InterfaceType _instance;
+
+        public bool Test(Type type)
         {
             return type.IsInterface;
         }
 
+        public ISerializeType GetSerializeType(Type type)
+        {
+            if (_instance == null)
+            {
+                _instance = new InterfaceType();
+            }
+            return _instance;
+        }
+    }
+
+    public class InterfaceType : SerializeType<IEnumerable>
+    {
         public override void Serialize(BinaryWriter writer, object value)
         {
             if (value == null)
@@ -47,6 +62,11 @@ namespace BlueDB.Serialize.Types
                 var fullNameValue = Encoding.UTF8.GetString(fullNameValueBytes);
 
                 var valueType = Type.GetType(fullNameValue);
+                if (valueType == null)
+                {
+                    throw new Exception(string.Format("Type not found: \"{0}\"!", fullNameValue));
+                }
+
                 var serialize = BinarySerialize.From(valueType);
 
                 return serialize.Deserialize(reader, valueType);

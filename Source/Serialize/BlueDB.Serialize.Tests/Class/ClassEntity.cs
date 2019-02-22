@@ -12,8 +12,9 @@ namespace BlueDB.Serialize.Tests.Class
         public System.DateTime Created { get; set; }
         public ClassEntityDeeperOne Deeper { get; set; }
         public ClassEntityDeeperOne DeeperNull { get; set; }
+        public ClassEntity Recursive { get; set; }
 
-        public void Populate()
+        public void Populate(bool stopRecursive = false)
         {
             Name = "ClassEntity";
             Index = 22;
@@ -29,6 +30,11 @@ namespace BlueDB.Serialize.Tests.Class
                     Index = 44
                 }
             };
+            if (!stopRecursive)
+            {
+                Recursive = new ClassEntity();
+                Recursive.Populate(true);
+            }
         }
     }
 

@@ -7,13 +7,21 @@ using System.Text;
 
 namespace BlueDB.Serialize.Types
 {
-    public class Int16Type : SerializeType<short>
+    public class Int16Provider : IProvider
     {
-        public override bool Test(Type type)
+        public bool Test(Type type)
         {
             return type.FullName == "System.Int16";
         }
 
+        public ISerializeType GetSerializeType(Type type)
+        {
+            return new Int16Type();
+        }
+    }
+
+    public class Int16Type : SerializeType<short>
+    {
         public override void Serialize(BinaryWriter writer, object value)
         {
             writer.Write((short)value);
@@ -25,13 +33,21 @@ namespace BlueDB.Serialize.Types
         }
     }
 
-    public class UInt16Type : SerializeType<ushort>
+    public class UInt16Provider : IProvider
     {
-        public override bool Test(Type type)
+        public bool Test(Type type)
         {
             return type.FullName == "System.UInt16";
         }
 
+        public ISerializeType GetSerializeType(Type type)
+        {
+            return new UInt16Type();
+        }
+    }
+
+    public class UInt16Type : SerializeType<ushort>
+    {
         public override void Serialize(BinaryWriter writer, object value)
         {
             writer.Write((ushort)value);

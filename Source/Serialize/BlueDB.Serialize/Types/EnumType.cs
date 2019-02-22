@@ -5,23 +5,39 @@ using System.Text;
 
 namespace BlueDB.Serialize.Types
 {
-    public class EnumType : SerializeType<Enum>
+    public class EnumProvider : IProvider
     {
-        public override bool Test(Type type)
+        public bool Test(Type type)
         {
             return type.IsEnum;
         }
 
+        public ISerializeType GetSerializeType(Type type)
+        {
+            var genericNowType = typeof(EnumType<>).MakeGenericType(type);
+            return (ISerializeType)Activator.CreateInstance(genericNowType);
+        }
+    }
+
+    public class EnumType<T> : SerializeType<T>
+    {
+        private ISerializeType _underSerialize;
+
+        public override void Initialize()
+        {
+            var type = typeof(T);
+            var underType = Enum.GetUnderlyingType(type);
+            _underSerialize = BinarySerialize.From(underType);
+        }
+
         public override void Serialize(BinaryWriter writer, object value)
         {
-            Enum.GetUnderlyingType(typeof(YourEnum));
-
-            writer.Write((Enum)value);
+            _underSerialize.Serialize(writer, value);
         }
 
         public override object Deserialize(BinaryReader reader, Type type)
         {
-            throw new NotImplementedException();
+            return _underSerialize.Deserialize(reader, type);
         }
     }
 }

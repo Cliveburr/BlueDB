@@ -7,11 +7,30 @@ using System.Text;
 
 namespace BlueDB.Serialize.Types
 {
-    public class IEnumerableType : SerializeType<IEnumerable>
+    public class IEnumerableProvider : IProvider
     {
-        public override bool Test(Type type)
+        public bool Test(Type type)
         {
-            return typeof(IEnumerable).IsAssignableFrom(type); ;
+            return typeof(IEnumerable).IsAssignableFrom(type);
+        }
+
+        public ISerializeType GetSerializeType(Type type)
+        {
+            var genericNowType = typeof(IEnumerableType<>).MakeGenericType(type);
+            return (ISerializeType)Activator.CreateInstance(genericNowType);
+        }
+    }
+
+    public class IEnumerableType<T> : SerializeType<T>
+    {
+        private Type _elementType;
+        private ISerializeType _elementSerialize;
+
+        public override void Initialize()
+        {
+            var type = typeof(T);
+            _elementType = type.GenericTypeArguments[0];
+            _elementSerialize = BinarySerialize.From(_elementType);
         }
 
         public override void Serialize(BinaryWriter writer, object value)
@@ -22,10 +41,7 @@ namespace BlueDB.Serialize.Types
             }
             else
             {
-                var elementType = value.GetType().GenericTypeArguments[0];
-
                 var ienum = value as IEnumerable;
-                var serialize = BinarySerialize.From(elementType);
 
                 var count = 0;
 
@@ -35,7 +51,7 @@ namespace BlueDB.Serialize.Types
                     foreach (var item in ienum)
                     {
                         count++;
-                        serialize.Serialize(writeStream, item);
+                        _elementSerialize.Serialize(writeStream, item);
                     }
 
                     writer.Write((uint)(count + 1));
@@ -54,15 +70,12 @@ namespace BlueDB.Serialize.Types
             }
             else
             {
-                var elementType = type.GenericTypeArguments[0];
-
-                var serialize = BinarySerialize.From(elementType);
                 length--;
-                var obj = Array.CreateInstance(elementType, length) as Array;
+                var obj = Array.CreateInstance(_elementType, length) as Array;
 
                 for (var i = 0; i < length; i++)
                 {
-                    obj.SetValue(serialize.Deserialize(reader, elementType), i);
+                    obj.SetValue(_elementSerialize.Deserialize(reader, _elementType), i);
                 }
 
                 return obj;

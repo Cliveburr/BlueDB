@@ -41,7 +41,6 @@ namespace BlueDB.DriverNET.ClientTest
                     new Property(PropertyType.Int32, "valor", 100)
                 )
                 .Set(
-                    new Property(PropertyType.Int32, "_id", 0),
                     new Property(PropertyType.String, "name", "teste numero dois"),
                     new Property(PropertyType.Int32, "valor", 110)
                 )

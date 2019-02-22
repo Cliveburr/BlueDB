@@ -8,12 +8,26 @@ using System.Text;
 
 namespace BlueDB.Serialize.Types
 {
+    public class ClassProvider : IProvider
+    {
+        public bool Test(Type type)
+        {
+            return true;
+        }
+
+        public ISerializeType GetSerializeType(Type type)
+        {
+            var genericNowType = typeof(ClassType<>).MakeGenericType(type);
+            return (ISerializeType)Activator.CreateInstance(genericNowType);
+        }
+    }
+
     public class ClassType<T> : SerializeType<T>
     {
-        public Tuple<SerializeType, PropertyInfo>[] Properties { get; private set; }
+        public Tuple<ISerializeType, PropertyInfo>[] Properties { get; private set; }
         public Type Type { get; private set; }
 
-        public ClassType()
+        public override void Initialize()
         {
             Type = typeof(T);
 
@@ -24,13 +38,8 @@ namespace BlueDB.Serialize.Types
         {
             Properties = Type.GetProperties()
                 .Where(p => p.CanWrite && p.CanRead)
-                .Select(p => new Tuple<SerializeType, PropertyInfo>(BinarySerialize.From(p.PropertyType), p))
+                .Select(p => new Tuple<ISerializeType, PropertyInfo>(BinarySerialize.From(p.PropertyType), p))
                 .ToArray();
-        }
-
-        public override bool Test(Type type)
-        {
-            return type.Equals(Type);
         }
 
         public override void Serialize(BinaryWriter writer, object value)

@@ -45,11 +45,22 @@ namespace BlueDB.Serialize.Tests.Class
 
         public static void Compare(ClassEntity from, ClassEntity to)
         {
-            Assert.AreEqual(from.Name, to.Name);
-            Assert.AreEqual(from.Index, to.Index);
-            Assert.AreEqual(from.Created, to.Created);
-            Assert.AreEqual(from.Deeper, to.Deeper);
-            Assert.AreEqual(from.DeeperNull, to.DeeperNull);
+            if (!(from != null ^ to != null))
+            {
+                if (from != null)
+                {
+                    Assert.AreEqual(from.Name, to.Name);
+                    Assert.AreEqual(from.Index, to.Index);
+                    Assert.AreEqual(from.Created, to.Created);
+                    Assert.AreEqual(from.Deeper, to.Deeper);
+                    Assert.AreEqual(from.DeeperNull, to.DeeperNull);
+                    Compare(from.Recursive, to.Recursive);
+                }
+            }
+            else
+            {
+                throw new Exception();
+            }
         }
     }
 }

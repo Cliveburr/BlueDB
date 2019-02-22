@@ -6,13 +6,21 @@ using System.Text;
 
 namespace BlueDB.Serialize.Types
 {
-    public class ByteType : SerializeType<byte>
+    public class ByteProvider : IProvider
     {
-        public override bool Test(Type type)
+        public bool Test(Type type)
         {
             return type.FullName == "System.Byte";
         }
 
+        public ISerializeType GetSerializeType(Type type)
+        {
+            return new ByteType();
+        }
+    }
+
+    public class ByteType : SerializeType<byte>
+    {
         public override void Serialize(BinaryWriter writer, object value)
         {
             writer.Write((byte)value);

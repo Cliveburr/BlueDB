@@ -6,13 +6,21 @@ using System.Text;
 
 namespace BlueDB.Serialize.Types
 {
-    public class Int64Type : SerializeType<long>
+    public class Int64Provider : IProvider
     {
-        public override bool Test(Type type)
+        public bool Test(Type type)
         {
             return type.FullName == "System.Int64";
         }
 
+        public ISerializeType GetSerializeType(Type type)
+        {
+            return new Int64Type();
+        }
+    }
+
+    public class Int64Type : SerializeType<long>
+    {
         public override void Serialize(BinaryWriter writer, object value)
         {
             writer.Write((long)value);
@@ -24,13 +32,21 @@ namespace BlueDB.Serialize.Types
         }
     }
 
-    public class UInt64Type : SerializeType<ulong>
+    public class UInt64Provider : IProvider
     {
-        public override bool Test(Type type)
+        public bool Test(Type type)
         {
             return type.FullName == "System.UInt64";
         }
 
+        public ISerializeType GetSerializeType(Type type)
+        {
+            return new UInt64Type();
+        }
+    }
+
+    public class UInt64Type : SerializeType<ulong>
+    {
         public override void Serialize(BinaryWriter writer, object value)
         {
             writer.Write((ulong)value);

@@ -8,13 +8,21 @@ using System.Text;
 
 namespace BlueDB.Serialize.Types
 {
-    public class StringType : SerializeType<string>
+    public class StringProvider : IProvider
     {
-        public override bool Test(Type type)
+        public bool Test(Type type)
         {
             return type.FullName == "System.String";
         }
 
+        public ISerializeType GetSerializeType(Type type)
+        {
+            return new StringType();
+        }
+    }
+
+    public class StringType : SerializeType<string>
+    {
         public override void Serialize(BinaryWriter writer, object value)
         {
             var stringValue = value as string;

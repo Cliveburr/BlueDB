@@ -3,20 +3,23 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace BlueDB.Serialize.Types
+namespace BlueDB.Serialize
 {
-    public abstract class SerializeType
+    public interface ISerializeType
     {
-        public abstract bool Test(Type type);
-        public abstract void Serialize(BinaryWriter writer, object value);
-        public abstract object Deserialize(BinaryReader reader, Type type);
+        void Initialize();
+        void Serialize(BinaryWriter writer, object value);
+        object Deserialize(BinaryReader reader, Type type);
     }
 
-    public abstract class SerializeType<T> : SerializeType
+    public abstract class SerializeType<T> : ISerializeType
     {
-        public override abstract bool Test(Type type);
-        public override abstract void Serialize(BinaryWriter writer, object value);
-        public override abstract object Deserialize(BinaryReader reader, Type type);
+        public abstract void Serialize(BinaryWriter writer, object value);
+        public abstract object Deserialize(BinaryReader reader, Type type);
+
+        public virtual void Initialize()
+        {
+        }
 
         public byte[] Serialize(T obj)
         {

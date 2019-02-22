@@ -6,13 +6,21 @@ using System.Text;
 
 namespace BlueDB.Serialize.Types
 {
-    public class DateTimeType : SerializeType<DateTime>
+    public class DateTimeProvider : IProvider
     {
-        public override bool Test(Type type)
+        public bool Test(Type type)
         {
             return type.FullName == "System.DateTime";
         }
 
+        public ISerializeType GetSerializeType(Type type)
+        {
+            return new DateTimeType();
+        }
+    }
+
+    public class DateTimeType : SerializeType<DateTime>
+    {
         public override void Serialize(BinaryWriter writer, object value)
         {
             var valueLong = ((DateTime)value).ToBinary();

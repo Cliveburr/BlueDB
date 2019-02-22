@@ -6,11 +6,30 @@ using System.Text;
 
 namespace BlueDB.Serialize.Types
 {
-    public class ArrayType : SerializeType<Array>
+    public class ArrayProvider : IProvider
     {
-        public override bool Test(Type type)
+        public bool Test(Type type)
         {
             return type.IsArray;
+        }
+
+        public ISerializeType GetSerializeType(Type type)
+        {
+            var genericNowType = typeof(ArrayType<>).MakeGenericType(type);
+            return (ISerializeType)Activator.CreateInstance(genericNowType);
+        }
+    }
+
+    public class ArrayType<T> : SerializeType<T>
+    {
+        private Type _elementType;
+        private ISerializeType _elementSerialize;
+
+        public override void Initialize()
+        {
+            var type = typeof(T);
+            _elementType = type.GetElementType();
+            _elementSerialize = BinarySerialize.From(_elementType);
         }
 
         public override void Serialize(BinaryWriter writer, object value)
@@ -22,13 +41,12 @@ namespace BlueDB.Serialize.Types
             else
             {
                 var array = value as Array;
-                var serialize = BinarySerialize.From(array.GetType().GetElementType());
                 
                 writer.Write((uint)(array.Length + 1));
 
                 for (var i = 0; i < array.Length; i++)
                 {
-                    serialize.Serialize(writer, array.GetValue(i));
+                    _elementSerialize.Serialize(writer, array.GetValue(i));
                 }
             }
         }
@@ -43,14 +61,12 @@ namespace BlueDB.Serialize.Types
             }
             else
             {
-                var arrayElementType = type.GetElementType();
-                var serialize = BinarySerialize.From(arrayElementType);
                 length--;
-                var obj = Array.CreateInstance(arrayElementType, length) as Array;
+                var obj = Array.CreateInstance(_elementType, length) as Array;
 
                 for (var i = 0; i < length; i++)
                 {
-                    obj.SetValue(serialize.Deserialize(reader, arrayElementType), i);
+                    obj.SetValue(_elementSerialize.Deserialize(reader, _elementType), i);
                 }
 
                 return obj;

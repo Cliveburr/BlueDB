@@ -9,51 +9,58 @@ namespace BlueDB.Serialize
 {
     public static class BinarySerialize
     {
-        public static IList<SerializeType> KnowTypes { get; set; }
+        private static IDictionary<string, ISerializeType> _knowTypes;
+        private static IProvider[] _providers;
 
         static BinarySerialize()
         {
-            SetDefaultKnowTypes();
+            _knowTypes = new Dictionary<string, ISerializeType>();
+
+            SetProviders();
         }
 
-        private static void SetDefaultKnowTypes()
+        private static void SetProviders()
         {
-            KnowTypes = new List<SerializeType>
+            _providers = new IProvider[]
             {
-                new ByteType(),
-                new Int16Type(),
-                new UInt16Type(),
-                new Int32Type(),
-                new UInt32Type(),
-                new Int64Type(),
-                new UInt64Type(),
-                new StringType(),
-                new DateTimeType(),
-                new ArrayType(),
-                new IEnumerableType(),
-                new InterfaceType()
+                new ByteProvider(),
+                new Int16Provider(),
+                new UInt16Provider(),
+                new Int32Provider(),
+                new UInt32Provider(),
+                new Int64Provider(),
+                new UInt64Provider(),
+                new StringProvider(),
+                new DateTimeProvider(),
+                new ArrayProvider(),
+                new DictionaryProvider(),
+                new IEnumerableProvider(),
+                new InterfaceProvider(),
+                new EnumProvider(),
+                new ClassProvider()
             };
         }
 
-        public static SerializeType From(Type type)
+        public static ISerializeType From(Type type)
         {
-            var knowType = KnowTypes
-                .Where(kp => kp.Test(type))
-                .FirstOrDefault();
+            var fullName = type.FullName;
 
-            if (knowType == null)
+            if (_knowTypes.ContainsKey(fullName))
             {
-                var genericNowType = typeof(ClassType<>).MakeGenericType(type);
-                knowType = (SerializeType)Activator.CreateInstance(genericNowType);
-                KnowTypes.Add(knowType);
+                return _knowTypes[fullName];
             }
-
-            if (knowType == null)
+            else
             {
-                throw new NotSupportedException($"Type \"{type.FullName}\" not supported for this serialize!");
-            }
+                var provider = _providers
+                    .First(p => p.Test(type));
 
-            return knowType;
+                var newKnowType = provider.GetSerializeType(type);
+                _knowTypes[fullName] = newKnowType;
+
+                newKnowType.Initialize();
+
+                return newKnowType;
+            }
         }
 
         public static SerializeType<T> From<T>()
