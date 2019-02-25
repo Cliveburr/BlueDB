@@ -55,6 +55,7 @@ namespace BlueDB.Host.Process
                     case CommandType.WithDatabase: WithDatabaseProcess.Execute(this, command as WithDatabaseCommand); break;
                     case CommandType.WithTable: WithTableProcess.Execute(this, command as WithTableCommand); break;
                     case CommandType.Set: SetProcess.Execute(this, command as SetCommand); break;
+                    case CommandType.Select: SelectProcess.Execute(this, command as SelectCommand); break;
                 }
             }
             catch (Exception err)

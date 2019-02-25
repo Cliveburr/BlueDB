@@ -7,8 +7,8 @@ namespace BlueDB.Host.Data
     public enum DataState : byte
     {
         Pristine = 0,
-        Created = 1,
-        Updated = 2,
-        Removed = 3
+        Create = 1,
+        Update = 2,
+        Remove = 3
     }
 }

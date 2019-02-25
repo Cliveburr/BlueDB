@@ -58,5 +58,14 @@ namespace BlueDB.DriverNET.Messages
 
             return _connection.SendMessage(request).Result;
         }
+
+        public RequestBuilder Select()
+        {
+            _commands.Add(new SelectCommand
+            {
+            });
+
+            return this;
+        }
     }
 }

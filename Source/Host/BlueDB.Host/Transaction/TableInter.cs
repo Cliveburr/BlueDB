@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,7 @@ using BlueDB.Host.Data.Interface;
 
 namespace BlueDB.Host.Transaction
 {
-    public class TableInter
+    public class TableInter : IDisposable, IEnumerable<IData>, IEnumerator<IData>, IEnumerator
     {
         public string Name { get; private set; }
 
@@ -25,11 +26,11 @@ namespace BlueDB.Host.Transaction
 
         public void Open(Action<TableInter> callBack)
         {
-            _data = new Data.MemoryData.Table();
             _tempData = new Dictionary<uint, IData>();
 
-            _data.Open(_database, Name, () =>
+            _database.OpenTable(Name, (table) =>
             {
+                _data = table;
                 _lastId = _data.LastId;
 
                 callBack(this);
@@ -58,10 +59,41 @@ namespace BlueDB.Host.Transaction
             {
                 Id = ReserveId(),
                 Datasets = datasets,
-                State = DataState.Created
+                State = DataState.Create
             };
 
             _tempData.Add(newData.Id, newData);
+        }
+
+        public void Rollback()
+        {
+            Dispose();
+        }
+
+        public void Commit()
+        {
+            _data.LastId = _lastId;
+
+            foreach (var data in _tempData)
+            {
+                switch (data.Value.State)
+                {
+                    case DataState.Create: _data.Insert(data.Value); break;
+                    case DataState.Update: _data.Update(data.Value); break;
+                    case DataState.Remove: _data.Remove(data.Value); break;
+                }
+            }
+
+            _data.Save();
+
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            _database = null;
+            _data = null;
+            _tempData = null;
         }
 
         public IData ReadById(uint id)
@@ -118,7 +150,31 @@ namespace BlueDB.Host.Transaction
                 }
             }
 
-            data.State = DataState.Updated;
+            data.State = DataState.Update;
+        }
+
+        public IData Current => throw new NotImplementedException();
+
+        object IEnumerator.Current => throw new NotImplementedException();
+
+        public IEnumerator<IData> GetEnumerator()
+        {
+            return this;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this;
+        }
+
+        public bool MoveNext()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Reset()
+        {
+            throw new NotImplementedException();
         }
     }
 }

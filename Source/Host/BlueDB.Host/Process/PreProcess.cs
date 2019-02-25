@@ -26,19 +26,34 @@ namespace BlueDB.Host.Process
         {
             var hasTransactionCommand = false;
 
+            var tablesToRead = new List<string>();
+            var tablesToLock = new List<string>();
+            var withDatabase = string.Empty;
+            var withTable = string.Empty;
+
             foreach (var command in context.Request.Commands)
             {
-
-                if (command.Type == CommandType.OpenTransaction ||
-                    command.Type == CommandType.CommitTransaction ||
-                    command.Type == CommandType.RollbackTransaction)
+                switch (command.Type)
                 {
-                    hasTransactionCommand = true;
+                    case CommandType.WithDatabase:
+                        withDatabase = ((WithDatabaseCommand)command).DatabaseName;
+                        break;
+                    case CommandType.WithTable:
+                        withTable = ((WithTableCommand)command).TableName;
+                        break;
+                    case CommandType.Set:
+                        tablesToLock.Add($"{withDatabase}.{withTable}");
+                        break;
+                    case CommandType.OpenTransaction:
+                    case CommandType.CommitTransaction:
+                    case CommandType.RollbackTransaction:
+                        hasTransactionCommand = true;
+                        break;
                 }
             }
 
-            context.TablesToRead = new string[0];
-            context.TablesToLock = new string[0];
+            context.TablesToRead = tablesToRead.ToArray();
+            context.TablesToLock = tablesToLock.ToArray();
 
             var containsTransaction = context.Connection.ContainsItemInBag("Transaction");
             if (!hasTransactionCommand && !containsTransaction)

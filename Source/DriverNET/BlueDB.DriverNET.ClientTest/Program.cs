@@ -20,7 +20,7 @@ namespace BlueDB.DriverNET.ClientTest
             {
                 TestOne(connection);
 
-                TestRefrence(connection);
+                TestReference(connection);
             }
 
             Console.ReadKey();
@@ -36,7 +36,6 @@ namespace BlueDB.DriverNET.ClientTest
                 .WithDatabase("Test0")
                 .WithTable("UserTest")
                 .Set(
-                    new Property(PropertyType.Int32, "_id", 0),
                     new Property(PropertyType.String, "name", "teste numero um"),
                     new Property(PropertyType.Int32, "valor", 100)
                 )
@@ -51,13 +50,13 @@ namespace BlueDB.DriverNET.ClientTest
                 )
                 .Process();
 
-            //var selectInTableUserTest = connection.CreateRequest()
-            //    .WithDatabase("Test0")
-            //    .WithTable("UserTest")
+            var selectInTableUserTest = connection.CreateRequest()
+                .WithDatabase("Test0")
+                .WithTable("UserTest")
             //    .Where("valor", 100)
             //    .Or().Where("valor", 110)
-            //    .Select()
-            //    .Process();
+                .Select()
+                .Process();
 
             //var removeFromTableUserTest = connection.CreateRequest()
             //    .WithDatabase("Test0")
@@ -67,7 +66,7 @@ namespace BlueDB.DriverNET.ClientTest
             //    .Process();
         }
 
-        static void TestRefrence(ClientConnection connection)
+        static void TestReference(ClientConnection connection)
         {
             //// filtra um item da tabela UserTest
             //// cria um registro na tabela UserExtraData com um vinculo para o item filtrado

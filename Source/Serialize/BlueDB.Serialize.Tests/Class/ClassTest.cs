@@ -62,5 +62,25 @@ namespace BlueDB.Serialize.Tests.Class
                 throw new Exception();
             }
         }
+
+        [TestMethod]
+        public void TestObject()
+        {
+            var test = new TestObjectClass
+            {
+                Value = "test 123"
+            };
+
+            var serialize = BinarySerialize.From<TestObjectClass>();
+
+            var bytes = serialize.Serialize(test);
+
+            var backFrom = serialize.Deserialize(bytes);
+        }
+
+        public class TestObjectClass
+        {
+            public object Value { get; set; }
+        }
     }
 }

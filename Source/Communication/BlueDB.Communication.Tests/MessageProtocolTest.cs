@@ -95,7 +95,7 @@ namespace BlueDB.Communication.Tests
 
     public class DirectTest : MessageProtocol
     {
-        private static Serialize.Types.SerializeType<DirectTestMessage> _serializeType;
+        private static SerializeType<DirectTestMessage> _serializeType;
 
         public delegate void OnMessageDelegate(DirectTestMessage message);
         public event OnMessageDelegate OnMessage;

@@ -13,6 +13,7 @@ namespace BlueDB.Communication.Messages.Commands
         RollbackTransaction = 4,
         WithDatabase = 5,
         WithTable = 6,
-        Set = 7
+        Set = 7,
+        Select = 8
     }
 }

@@ -1,11 +1,12 @@
-﻿using BlueDB.Host.Data.Interface;
+﻿using BlueDB.Host.Data;
+using BlueDB.Host.Data.Interface;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace BlueDB.Host.Transaction
 {
-    public class DatabaseInter
+    public class DatabaseInter : IDisposable
     {
         public string Name { get; private set; }
         public TableInter TableSelected { get; set; }
@@ -20,11 +21,12 @@ namespace BlueDB.Host.Transaction
 
         public void Open(Action<DatabaseInter> callBack)
         {
-            _data = new Data.MemoryData.Database();
             _tables = new Dictionary<string, TableInter>();
 
-            _data.Open(Name, () =>
+            DatabaseInstance.Open(Name, (database) =>
             {
+                _data = database;
+
                 callBack(this);
             });
         }
@@ -42,6 +44,33 @@ namespace BlueDB.Host.Transaction
 
                 newTable.Open(callBack);
             }
+        }
+
+        public void Commit()
+        {
+            _data.Save();
+
+            foreach (var table in _tables)
+            {
+                table.Value.Commit();
+            }
+            Dispose();
+        }
+
+        public void Rollback()
+        {
+            foreach (var table in _tables)
+            {
+                table.Value.Rollback();
+            }
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            TableSelected = null;
+            _data = null;
+            _tables = null;
         }
     }
 }

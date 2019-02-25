@@ -25,7 +25,7 @@ namespace BlueDB.Communication.Entity
         {
             get
             {
-                return (uint)Value;
+                return Convert.ToUInt32(Value);
             }
         }
     }

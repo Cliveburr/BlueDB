@@ -4,7 +4,7 @@ using System.Text;
 
 namespace BlueDB.Host.Transaction
 {
-    public class TransactionOperation
+    public class TransactionOperation : IDisposable
     {
         public Dictionary<string, DatabaseInter> Databases { get; set; }
 
@@ -26,6 +26,31 @@ namespace BlueDB.Host.Transaction
 
                 newDatabase.Open(callBack);
             }
+        }
+
+        public void Commit(Action callBack)
+        {
+            foreach (var database in Databases)
+            {
+                database.Value.Commit();
+            }
+            Dispose();
+
+            callBack();
+        }
+
+        public void Rollback()
+        {
+            foreach (var database in Databases)
+            {
+                database.Value.Rollback();
+            }
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            Databases = null;
         }
     }
 }

@@ -31,12 +31,16 @@ namespace BlueDB.Host.Process.Commands
     {
         public static void Execute(Executor executor, CommitTransactionCommand commitTransactionCommand)
         {
+            var transaction = executor.ProcessContext.Connection.GetItemInBag<TransactionOperation>(BagNames.TRANSACTION);
 
-            executor.ProcessContext.Connection.RemoteItemInBag(BagNames.TRANSACTION);
+            transaction.Commit(() =>
+            {
+                executor.ProcessContext.Connection.RemoteItemInBag(BagNames.TRANSACTION);
 
-            ExecutorController.Instance.ReleaseTables(executor.ProcessContext.TablesToLock);
+                ExecutorController.Instance.ReleaseTables(executor.ProcessContext.TablesToLock);
 
-            executor.ExecuteNextCommand();
+                executor.ExecuteNextCommand();
+            });
         }
     }
 
@@ -44,6 +48,9 @@ namespace BlueDB.Host.Process.Commands
     {
         public static void Execute(Executor executor, RollbackTransactionCommand rollbackTransactionCommand)
         {
+            var transaction = executor.ProcessContext.Connection.GetItemInBag<TransactionOperation>(BagNames.TRANSACTION);
+
+            transaction.Rollback();
 
             executor.ProcessContext.Connection.RemoteItemInBag(BagNames.TRANSACTION);
 

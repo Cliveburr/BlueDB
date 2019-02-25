@@ -37,6 +37,7 @@ namespace BlueDB.Serialize
                 new IEnumerableProvider(),
                 new InterfaceProvider(),
                 new EnumProvider(),
+                new ObjectProvider(),
                 new ClassProvider()
             };
         }
