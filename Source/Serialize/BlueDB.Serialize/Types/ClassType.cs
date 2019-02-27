@@ -1,4 +1,5 @@
-﻿using BlueDB.Serialize.Types;
+﻿using BlueDB.Serialize.Attributes;
+using BlueDB.Serialize.Types;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -38,8 +39,26 @@ namespace BlueDB.Serialize.Types
         {
             Properties = Type.GetProperties()
                 .Where(p => p.CanWrite && p.CanRead)
-                .Select(p => new Tuple<ISerializeType, PropertyInfo>(BinarySerialize.From(p.PropertyType), p))
+                .Select(p => ReadSerializeFromProperty(p))
                 .ToArray();
+        }
+
+        private Tuple<ISerializeType, PropertyInfo> ReadSerializeFromProperty(PropertyInfo property)
+        {
+            var attribute = property.GetCustomAttributes(typeof(SerializeTypeAttribute), true)
+                .FirstOrDefault() as SerializeTypeAttribute;
+            if (attribute == null)
+            {
+                return new Tuple<ISerializeType, PropertyInfo>(BinarySerialize.From(property.PropertyType), property);
+            }
+            else
+            {
+                var serialize = attribute.GetSerializeType(property.PropertyType);
+
+                serialize.Initialize();
+
+                return new Tuple<ISerializeType, PropertyInfo>(serialize, property);
+            }
         }
 
         public override void Serialize(BinaryWriter writer, object value)

@@ -1,4 +1,5 @@
-﻿using BlueDB.Serialize.Types;
+﻿using BlueDB.Serialize.Attributes;
+using BlueDB.Serialize.Types;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -23,6 +24,7 @@ namespace BlueDB.Serialize
         {
             _providers = new IProvider[]
             {
+                new AttributeProvider(),
                 new ByteProvider(),
                 new Int16Provider(),
                 new UInt16Provider(),
