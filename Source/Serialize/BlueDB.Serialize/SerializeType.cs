@@ -9,13 +9,15 @@ namespace BlueDB.Serialize
     {
         void Initialize();
         void Serialize(BinaryWriter writer, object value);
-        object Deserialize(BinaryReader reader, Type type);
+        object Deserialize(BinaryReader reader);
+        int CalculateSize();
     }
 
     public abstract class SerializeType<T> : ISerializeType
     {
         public abstract void Serialize(BinaryWriter writer, object value);
-        public abstract object Deserialize(BinaryReader reader, Type type);
+        public abstract object Deserialize(BinaryReader reader);
+        public abstract int CalculateSize();
 
         public virtual void Initialize()
         {
@@ -37,7 +39,7 @@ namespace BlueDB.Serialize
             using (var memoryStream = new MemoryStream(bytes))
             using (var readerStream = new BinaryReader(memoryStream))
             {
-                return (T)Deserialize(readerStream, typeof(T));
+                return (T)Deserialize(readerStream);
             }
         }
     }

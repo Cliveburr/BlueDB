@@ -26,9 +26,14 @@ namespace BlueDB.Serialize.Types
             writer.Write((byte)value);
         }
 
-        public override object Deserialize(BinaryReader reader, Type type)
+        public override object Deserialize(BinaryReader reader)
         {
             return reader.ReadByte();
+        }
+
+        public override int CalculateSize()
+        {
+            return 1;
         }
     }
 }

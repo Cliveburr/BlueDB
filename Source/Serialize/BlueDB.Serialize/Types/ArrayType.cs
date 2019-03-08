@@ -51,7 +51,7 @@ namespace BlueDB.Serialize.Types
             }
         }
 
-        public override object Deserialize(BinaryReader reader, Type type)
+        public override object Deserialize(BinaryReader reader)
         {
             var length = reader.ReadUInt32();
 
@@ -66,11 +66,16 @@ namespace BlueDB.Serialize.Types
 
                 for (var i = 0; i < length; i++)
                 {
-                    obj.SetValue(_elementSerialize.Deserialize(reader, _elementType), i);
+                    obj.SetValue(_elementSerialize.Deserialize(reader), i);
                 }
 
                 return obj;
             }
+        }
+
+        public override int CalculateSize()
+        {
+            return _elementSerialize.CalculateSize();
         }
     }
 }

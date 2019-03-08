@@ -54,10 +54,15 @@ namespace BlueDB.Serialize.Tests.AttributeProvider
             writer.Write(fixedBytes);
         }
 
-        public override object Deserialize(BinaryReader reader, Type type)
+        public override object Deserialize(BinaryReader reader)
         {
             var bytes = reader.ReadBytes(_size);
             return Encoding.UTF8.GetString(bytes);
+        }
+
+        public override int CalculateSize()
+        {
+            return _size;
         }
     }
 #pragma warning restore

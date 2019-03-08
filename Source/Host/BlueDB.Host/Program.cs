@@ -12,9 +12,10 @@ namespace BlueDB.Host
     {
         static void Main(string[] args)
         {
-            var server = new SocketServer();
-
-            server.BeginMessageProcess = MessageProcess;
+            var server = new SocketServer
+            {
+                BeginMessageProcess = MessageProcess
+            };
 
             server.Start("127.0.0.1", 8011);
 
@@ -35,14 +36,14 @@ namespace BlueDB.Host
             ExecutorController.Instance.ScheduleToProcess(context);
         }
 
-        private static void ResponseErrors(ProcessContext context, Exception error)
-        {
-            var response = new MessageReponse
-            {
-                Error = error.Message
-            };
+        //private static void ResponseErrors(ProcessContext context, Exception error)
+        //{
+        //    var response = new MessageReponse
+        //    {
+        //        Error = error.Message
+        //    };
 
-            context.Callback(response);
-        }
+        //    context.Callback(response);
+        //}
     }
 }

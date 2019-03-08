@@ -1,6 +1,7 @@
 ﻿using BlueDB.Serialize.Attributes;
 using BlueDB.Serialize.Types;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -45,19 +46,18 @@ namespace BlueDB.Serialize.Types
 
         private Tuple<ISerializeType, PropertyInfo> ReadSerializeFromProperty(PropertyInfo property)
         {
-            var attribute = property.GetCustomAttributes(typeof(SerializeTypeAttribute), true)
-                .FirstOrDefault() as SerializeTypeAttribute;
-            if (attribute == null)
-            {
-                return new Tuple<ISerializeType, PropertyInfo>(BinarySerialize.From(property.PropertyType), property);
-            }
-            else
+            if (property.GetCustomAttributes(typeof(SerializeTypeAttribute), true)
+                .FirstOrDefault() is SerializeTypeAttribute attribute)
             {
                 var serialize = attribute.GetSerializeType(property.PropertyType);
 
                 serialize.Initialize();
 
                 return new Tuple<ISerializeType, PropertyInfo>(serialize, property);
+            }
+            else
+            {
+                return new Tuple<ISerializeType, PropertyInfo>(BinarySerialize.From(property.PropertyType), property);
             }
         }
 
@@ -80,7 +80,7 @@ namespace BlueDB.Serialize.Types
             }
         }
 
-        public override object Deserialize(BinaryReader reader, Type type)
+        public override object Deserialize(BinaryReader reader)
         {
             var value = reader.ReadByte();
 
@@ -92,7 +92,7 @@ namespace BlueDB.Serialize.Types
 
                         foreach (var property in Properties)
                         {
-                            var propValue = property.Item1.Deserialize(reader, property.Item2.PropertyType);
+                            var propValue = property.Item1.Deserialize(reader);
 
                             property.Item2.SetValue(obj, propValue);
                         }
@@ -102,6 +102,52 @@ namespace BlueDB.Serialize.Types
                 default:
                     return null;
             }
+        }
+
+        public override int CalculateSize()
+        {
+            var sum = 0;
+            foreach (var property in Properties)
+            {
+                if (property.Item2.GetCustomAttributes(typeof(SerializeSizeAttribute), true)
+                    .FirstOrDefault() is SerializeSizeAttribute attribute)
+                {
+                    var size = attribute.Size;
+                    if (typeof(string).Equals(property.Item2.PropertyType))
+                    {
+                        sum += 2 + size;
+                    }
+                    else if (typeof(IEnumerable).IsAssignableFrom(property.Item2.PropertyType))
+                    {
+                        var value = property.Item1.CalculateSize();
+                        if (value == -1)
+                        {
+                            return -1;
+                        }
+                        else
+                        {
+                            sum += 2 + (value * size);
+                        }
+                    }
+                    else
+                    {
+                        sum += size;
+                    }
+                }
+                else
+                {
+                    var value = property.Item1.CalculateSize();
+                    if (value == -1)
+                    {
+                        return -1;
+                    }
+                    else
+                    {
+                        sum += value;
+                    }
+                }
+            }
+            return sum;
         }
     }
 }

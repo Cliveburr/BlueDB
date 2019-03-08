@@ -1,16 +1,14 @@
 ﻿using BlueDB.Serialize.Attributes;
 using BlueDB.Serialize.Types;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace BlueDB.Serialize
 {
     public static class BinarySerialize
     {
-        private static IDictionary<string, ISerializeType> _knowTypes;
+        private static readonly IDictionary<string, ISerializeType> _knowTypes;
         private static IProvider[] _providers;
 
         static BinarySerialize()

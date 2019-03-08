@@ -53,12 +53,17 @@ namespace BlueDB.Serialize.Attributes
             knowType.Item3.Serialize(writer, value);
         }
 
-        public override object Deserialize(BinaryReader reader, Type type)
+        public override object Deserialize(BinaryReader reader)
         {
             var knowTypeIndex = reader.ReadUInt16();
             var knowType = _knowTypes[knowTypeIndex];
 
-            return knowType.Item3.Deserialize(reader, type);
+            return knowType.Item3.Deserialize(reader);
+        }
+
+        public override int CalculateSize()
+        {
+            return -1;
         }
     }
 }

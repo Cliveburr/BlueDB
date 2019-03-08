@@ -98,9 +98,12 @@ namespace BlueDB.Host.Process
 
         public void ReleaseTables(string[] tables)
         {
-            foreach (var table in tables)
+            lock (_processLock)
             {
-                _tablesLocked.Remove(table);
+                foreach (var table in tables)
+                {
+                    _tablesLocked.Remove(table);
+                }
             }
         }
     }

@@ -63,5 +63,25 @@ namespace BlueDB.Serialize.Tests.AttributeProvider
             Assert.AreEqual(values.ObjectProp, returnedValues.ObjectProp);
             Assert.AreEqual(((KnowTypeTestClass0)values.InterfaceProp).Class0String, ((KnowTypeTestClass0)returnedValues.InterfaceProp).Class0String);
         }
+
+        [TestMethod]
+        public void KnowTypeTestUnknow()
+        {
+            var values = new KnowTypeEntity
+            {
+                ObjectProp = System.DateTime.Now
+            };
+
+            try
+            {
+                var serialize = BinarySerialize.From<KnowTypeEntity>();
+
+                var bytes = serialize.Serialize(values);
+            }
+            catch (Exception err)
+            {
+                Assert.AreEqual(err.Message.StartsWith("Unknow"), true);
+            }
+        }
     }
 }

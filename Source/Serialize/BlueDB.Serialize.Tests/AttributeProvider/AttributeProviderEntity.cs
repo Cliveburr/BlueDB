@@ -25,7 +25,7 @@ namespace BlueDB.Serialize.Tests.AttributeProvider
             writer.Write(obj.SomeAnyValue);
         }
 
-        public override object Deserialize(BinaryReader reader, Type type)
+        public override object Deserialize(BinaryReader reader)
         {
             var someAnyValue = reader.ReadInt32();
 
@@ -33,6 +33,11 @@ namespace BlueDB.Serialize.Tests.AttributeProvider
             {
                 SomeAnyValue = someAnyValue
             };
+        }
+
+        public override int CalculateSize()
+        {
+            return 2;
         }
     }
 

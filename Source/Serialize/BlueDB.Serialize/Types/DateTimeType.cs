@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
-using System.Text;
 
 namespace BlueDB.Serialize.Types
 {
@@ -27,11 +24,16 @@ namespace BlueDB.Serialize.Types
             writer.Write(valueLong);
         }
 
-        public override object Deserialize(BinaryReader reader, Type type)
+        public override object Deserialize(BinaryReader reader)
         {
             var value = reader.ReadInt64();
             var dateTime =  DateTime.FromBinary(value);
             return dateTime;
+        }
+
+        public override int CalculateSize()
+        {
+            return 8;
         }
     }
 }
