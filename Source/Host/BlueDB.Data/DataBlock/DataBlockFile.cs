@@ -45,7 +45,7 @@ namespace BlueDB.Data.DataBlock
     }
 
 
-    public abstract class BlockStream : Stream
+    public class BlockStream : Stream, IDisposable
     {
         public override bool CanRead => _ioStream.CanRead;
         public override bool CanSeek => false;
@@ -57,14 +57,14 @@ namespace BlueDB.Data.DataBlock
         private int _blockBodySize;
         private int _blockleft;
         private long _blockPosition;
+        private Func<long> _getFreeBlockPosition;
 
-        public abstract long GetFreeBlockPosition();
-
-        public BlockStream(Stream ioStream, int blockSize)
+        public BlockStream(Stream ioStream, int blockSize, Func<long> getFreeBlockPosition)
         {
             _ioStream = ioStream;
             _blockPosition = -1;
             _blockleft = 0;
+            _getFreeBlockPosition = getFreeBlockPosition;
 
             SetBlockSize(blockSize);
         }
@@ -73,6 +73,16 @@ namespace BlueDB.Data.DataBlock
         {
             _blockSize = blockSize;
             _blockBodySize = blockSize - 4;
+        }
+
+        public new void Dispose()
+        {
+            _ioStream?.Flush();
+            _ioStream?.Close();
+            _ioStream?.Dispose();
+            _ioStream = null;
+
+            base.Dispose();
         }
 
         public override long Position
@@ -148,7 +158,7 @@ namespace BlueDB.Data.DataBlock
             {
                 if (_blockleft == 0)
                 {
-                    _blockPosition = GetFreeBlockPosition();
+                    _blockPosition = _getFreeBlockPosition();
                     var ioPosition = _blockSize * _blockPosition;
                     var fileBorder = ioPosition + _blockSize;
 
